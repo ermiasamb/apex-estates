@@ -23,16 +23,16 @@ export function PropertyCard({ property }: PropertyCardProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+    <Card className="flex flex-col h-full overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
       <CardHeader className="p-0 relative">
-        <Link href={`/property/${property.id}`} className="block">
+        <Link href={`/property/${property.id}`} className="block overflow-hidden">
           <div className="aspect-[4/3] w-full relative">
             {image ? (
               <Image
                 src={image.imageUrl}
                 alt={image.description}
                 fill
-                className="object-cover"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 data-ai-hint={image.imageHint}
               />
@@ -41,45 +41,48 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 <span className="text-muted-foreground">No Image</span>
               </div>
             )}
+             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
           </div>
         </Link>
-        <div className="absolute top-3 left-3 flex gap-2">
-            <Badge variant={property.type === 'sale' ? 'default' : 'secondary'} className="capitalize bg-primary/80 backdrop-blur-sm">
+        <div className="absolute top-4 left-4 flex gap-2">
+            <Badge variant={property.type === 'sale' ? 'default' : 'secondary'} className="capitalize bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary/50">
                 For {property.type}
             </Badge>
         </div>
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-3 right-3">
             <FavoriteButton propertyId={property.id} />
         </div>
-      </CardHeader>
-      <CardContent className="p-4 flex-grow">
-        <Link href={`/property/${property.id}`} className="block">
-          <p className="font-semibold text-2xl text-primary">{formatPrice(property.price)}</p>
-          <CardTitle className="text-xl font-headline font-semibold mt-1 mb-2 truncate" title={property.title}>
-              {property.title}
-          </CardTitle>
-          <div className="flex items-center gap-2 text-muted-foreground text-sm">
-            <MapPin className="w-4 h-4 shrink-0" />
-            <span className="truncate">{property.address}</span>
-          </div>
-        </Link>
-      </CardContent>
-      <CardFooter className="p-4 bg-muted/50 border-t">
-        <div className="flex justify-around items-center w-full text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <BedDouble className="w-5 h-5 text-primary/80" />
-            <span>{property.bedrooms} Beds</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Bath className="w-5 h-5 text-primary/80" />
-            <span>{property.bathrooms} Baths</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <SquareGanttChart className="w-5 h-5 text-primary/80" />
-            <span>{property.area.toLocaleString()} sqft</span>
-          </div>
+         <div className="absolute bottom-4 left-4">
+            <p className="font-bold text-2xl text-white text-shadow">{formatPrice(property.price)}</p>
         </div>
-      </CardFooter>
+      </CardHeader>
+      <Link href={`/property/${property.id}`} className="flex flex-col flex-grow">
+        <CardContent className="p-4 flex-grow">
+            <CardTitle className="text-xl font-headline font-bold mt-1 mb-2 truncate" title={property.title}>
+                {property.title}
+            </CardTitle>
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <MapPin className="w-4 h-4 shrink-0" />
+                <span className="truncate">{property.address}</span>
+            </div>
+        </CardContent>
+        <CardFooter className="p-4 bg-muted/30 border-t">
+            <div className="flex justify-between items-center w-full text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+                <BedDouble className="w-5 h-5 text-primary/70" />
+                <span>{property.bedrooms} Beds</span>
+            </div>
+            <div className="flex items-center gap-2">
+                <Bath className="w-5 h-5 text-primary/70" />
+                <span>{property.bathrooms} Baths</span>
+            </div>
+            <div className="flex items-center gap-2">
+                <SquareGanttChart className="w-5 h-5 text-primary/70" />
+                <span>{property.area.toLocaleString()} sqft</span>
+            </div>
+            </div>
+        </CardFooter>
+      </Link>
     </Card>
   );
 }

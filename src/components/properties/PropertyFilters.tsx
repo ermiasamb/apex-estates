@@ -4,13 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { RadioGroup } from '@/components/ui/radio-group';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
 type FilterState = {
     query: string;
-    type: 'sale' | 'rent' | null;
+    type: 'sale' | 'rent' | 'all' | null;
     minPrice: number;
     maxPrice: number;
     bedrooms: string;
@@ -38,19 +37,22 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
     const formatPrice = (value: number) => {
         if (value >= 10000000) return 'Any';
         if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-        if (value >= 1000) return `$${(value / 1000)}k`;
+        if (value >= 1000) return `$${Math.round(value / 1000)}k`;
         return `$${value}`;
     }
 
+    const bedOptions = ['any', '1', '2', '3', '4+'];
+    const bathOptions = ['any', '1', '2', '3+'];
+
     return (
-        <Card>
+        <Card className="sticky top-24">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">Filter Properties</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="search">Search Location</Label>
-                    <Input id="search" placeholder="City, neighborhood..." value={filters.query} onChange={handleInputChange} />
+                    <Label htmlFor="search">Search Location or Keyword</Label>
+                    <Input id="search" placeholder="e.g. 'Malibu' or 'Ocean View'" value={filters.query} onChange={handleInputChange} />
                 </div>
                 
                 <div className="space-y-2">
@@ -69,34 +71,34 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
 
                 <div className="space-y-2">
                     <Label>Price Range</Label>
-                    <Slider 
-                        defaultValue={[0, 10000000]} 
-                        max={10000000} 
-                        step={100000} 
-                        onValueChange={handleSliderChange}
-                    />
-                    <div className="flex justify-between text-sm text-muted-foreground">
+                     <div className="flex justify-between text-sm font-medium">
                         <span>{formatPrice(filters.minPrice)}</span>
                         <span>{formatPrice(filters.maxPrice)}</span>
                     </div>
+                    <Slider 
+                        defaultValue={[0, 10000000]} 
+                        max={10000000} 
+                        step={50000} 
+                        onValueChange={handleSliderChange}
+                    />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                     <Label>Bedrooms</Label>
-                     <RadioGroup value={filters.bedrooms} onValueChange={handleSelectChange('bedrooms')} className="flex flex-wrap gap-2">
-                         {['any', '1', '2', '3', '4+'].map(val => (
-                             <Button key={val} size="sm" variant={filters.bedrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bedrooms')(val)}>{val === '4+' ? '4+' : val}</Button>
+                     <div className="flex flex-wrap gap-2">
+                         {bedOptions.map(val => (
+                             <Button key={val} size="sm" variant={filters.bedrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bedrooms')(val)} className="flex-1">{val}</Button>
                          ))}
-                     </RadioGroup>
+                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                     <Label>Bathrooms</Label>
-                     <RadioGroup value={filters.bathrooms} onValueChange={handleSelectChange('bathrooms')} className="flex flex-wrap gap-2">
-                         {['any', '1', '2', '3+'].map(val => (
-                            <Button key={val} size="sm" variant={filters.bathrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bathrooms')(val)}>{val}</Button>
+                     <div className="flex flex-wrap gap-2">
+                         {bathOptions.map(val => (
+                             <Button key={val} size="sm" variant={filters.bathrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bathrooms')(val)} className="flex-1">{val}</Button>
                          ))}
-                     </RadioGroup>
+                     </div>
                 </div>
 
             </CardContent>

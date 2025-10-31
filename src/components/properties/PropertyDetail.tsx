@@ -16,13 +16,17 @@ import { MortgageCalculator } from '@/components/properties/MortgageCalculator';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Property } from '@/lib/types';
+import { useIsMapsApiLoaded } from './MapsApiProvider';
+import { cn } from '@/lib/utils';
+
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(mod => mod.PropertyMap), {
   ssr: false,
-  loading: () => <Skeleton className="h-96 w-full" />
+  loading: () => <Skeleton className="h-96 w-full rounded-lg" />
 });
 
-const placeIcons = {
+
+const placeIcons: Record<string, React.ReactElement> = {
     hospital: <Hospital className="w-5 h-5 text-primary" />,
     school: <School className="w-5 h-5 text-primary" />,
     restaurant: <UtensilsIcon className="w-5 h-5 text-primary" />,
@@ -32,6 +36,7 @@ export function PropertyDetail({ property }: { property: Property }) {
   const broker = brokers.find((b) => b.id === property.brokerId);
   const brokerAvatar = placeholderImages.find(p => p.id === broker?.avatarId);
   const floorPlanImage = placeholderImages.find(p => p.id === property.floorPlanId);
+  const isMapsLoaded = useIsMapsApiLoaded();
 
   const formatPrice = (price: number) => {
     if (property.type === 'rent') {
@@ -45,130 +50,138 @@ export function PropertyDetail({ property }: { property: Property }) {
   return (
     <>
       <TrackView propertyId={property.id} />
-      <div className="bg-muted/20">
-        <div className="container mx-auto px-4 py-8 md:py-12">
-            {/* Header */}
-            <div className="mb-6">
-                <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">{property.title}</h1>
-                <div className="flex items-center gap-2 text-muted-foreground mt-2">
-                    <MapPin className="w-5 h-5" />
-                    <span className="text-lg">{property.address}</span>
-                </div>
-            </div>
-            
-            {/* Gallery */}
-            <div className='mb-8'>
-                <PhotoGallery imageIds={property.imageIds} />
-            </div>
+      <div className="bg-background">
+        {/* Gallery */}
+        <div className='container mx-auto px-4 pt-8'>
+            <PhotoGallery imageIds={property.imageIds} />
+        </div>
 
+        <div className="container mx-auto px-4 py-8 md:py-12">
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-2 space-y-8">
-                    {/* Details Card */}
-                    <Card className="overflow-hidden">
-                        <CardHeader className='bg-muted/50'>
-                            <div className="flex justify-between items-center">
-                                <CardTitle className="text-2xl font-headline">Property Details</CardTitle>
-                                <Badge variant="outline" className='capitalize text-base'>{property.status}</Badge>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-6">
-                            <div className="flex justify-between items-start mb-6">
-                                <p className="font-semibold text-4xl text-primary">{formatPrice(property.price)}</p>
-                                <FavoriteButton propertyId={property.id} className="h-12 w-12" />
-                            </div>
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex justify-between items-start">
+                            <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">{property.title}</h1>
+                            <FavoriteButton propertyId={property.id} className="h-12 w-12 bg-card border shadow-sm" />
+                        </div>
+                        <div className="flex items-center gap-2 text-muted-foreground mt-2">
+                            <MapPin className="w-5 h-5" />
+                            <span className="text-lg">{property.address}</span>
+                        </div>
+                    </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center my-6">
-                                <div className="p-3 bg-muted/50 rounded-lg"><BedDouble className="w-6 h-6 text-primary mx-auto mb-1" />{property.bedrooms} Beds</div>
-                                <div className="p-3 bg-muted/50 rounded-lg"><Bath className="w-6 h-6 text-primary mx-auto mb-1" />{property.bathrooms} Baths</div>
-                                <div className="p-3 bg-muted/50 rounded-lg"><SquareGanttChart className="w-6 h-6 text-primary mx-auto mb-1" />{property.area.toLocaleString()} sqft</div>
-                                <div className="p-3 bg-muted/50 rounded-lg"><Building className="w-6 h-6 text-primary mx-auto mb-1" />For {property.type}</div>
-                            </div>
+                    {/* Details Bar */}
+                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center my-6">
+                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary">{property.bedrooms}</div><div className="text-sm text-muted-foreground">Beds</div></div>
+                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary">{property.bathrooms}</div><div className="text-sm text-muted-foreground">Baths</div></div>
+                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary">{property.area.toLocaleString()}</div><div className="text-sm text-muted-foreground">sqft</div></div>
+                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary capitalize">{property.type}</div><div className="text-sm text-muted-foreground">Type</div></div>
+                    </div>
 
-                            <Separator className="my-6" />
+                    <Separator />
 
-                            <div className="prose prose-lg max-w-none text-foreground/90">
-                                <h3 className='font-headline text-xl mb-2'>Description</h3>
-                                <p>{property.description}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    {/* Description */}
+                    <div className="prose prose-lg max-w-none text-foreground/90">
+                        <h3 className='font-headline text-2xl mb-4'>Property Description</h3>
+                        <p>{property.description}</p>
+                    </div>
 
                      {/* Amenities Card */}
-                    <Card>
-                        <CardHeader><CardTitle className="font-headline text-2xl">Amenities</CardTitle></CardHeader>
-                        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
-                            {propertyAmenities.map(amenity => (
-                            <div key={amenity.name} className="flex items-center gap-3">
-                                <amenity.icon className="w-5 h-5 text-primary" />
-                                <span className="font-medium">{amenity.name}</span>
-                            </div>
-                            ))}
-                        </CardContent>
-                    </Card>
+                     {propertyAmenities.length > 0 && (
+                        <>
+                            <Separator />
+                            <Card>
+                                <CardHeader><CardTitle className="font-headline text-2xl">Amenities</CardTitle></CardHeader>
+                                <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
+                                    {propertyAmenities.map(amenity => (
+                                    <div key={amenity.name} className="flex items-center gap-3">
+                                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary">
+                                            <amenity.icon className="w-5 h-5" />
+                                        </div>
+                                        <span className="font-medium">{amenity.name}</span>
+                                    </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        </>
+                     )}
 
                     {property.vrTourUrl && (
-                        <Card>
-                            <CardHeader><CardTitle className="font-headline text-2xl flex items-center gap-2"><Eye/> 360° Virtual Tour</CardTitle></CardHeader>
-                            <CardContent>
-                                <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
-                                    <iframe
-                                        className="w-full h-full"
-                                        src={property.vrTourUrl}
-                                        title="360 Virtual Tour"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
-                                        allowFullScreen
-                                    ></iframe>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <>
+                            <Separator />
+                            <Card>
+                                <CardHeader><CardTitle className="font-headline text-2xl flex items-center gap-3"><Eye/> 360° Virtual Tour</CardTitle></CardHeader>
+                                <CardContent>
+                                    <div className="aspect-video w-full rounded-lg overflow-hidden border">
+                                        <iframe
+                                            className="w-full h-full"
+                                            src={property.vrTourUrl}
+                                            title="360 Virtual Tour"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
+                                            allowFullScreen
+                                        ></iframe>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </>
                     )}
                     
                     {/* Media Grid */}
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                        {floorPlanImage && (
-                            <Card>
-                                <CardHeader><CardTitle className="font-headline text-2xl">Floor Plan</CardTitle></CardHeader>
-                                <CardContent>
-                                    <Image src={floorPlanImage.imageUrl} alt="Floor Plan" width={800} height={600} className="rounded-md w-full" data-ai-hint={floorPlanImage.imageHint} />
-                                </CardContent>
-                            </Card>
-                        )}
-                        {property.videoUrl && (
-                            <Card>
-                                <CardHeader><CardTitle className="font-headline text-2xl">Video Tour</CardTitle></CardHeader>
-                                <CardContent>
-                                    <div className="aspect-video">
-                                        <iframe className="w-full h-full rounded-md" src={property.videoUrl} title="Property Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
+                    {(floorPlanImage || property.videoUrl) && (
+                        <>
+                            <Separator />
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                                {floorPlanImage && (
+                                    <Card>
+                                        <CardHeader><CardTitle className="font-headline text-2xl">Floor Plan</CardTitle></CardHeader>
+                                        <CardContent>
+                                            <Image src={floorPlanImage.imageUrl} alt="Floor Plan" width={800} height={600} className="rounded-md w-full border" data-ai-hint={floorPlanImage.imageHint} />
+                                        </CardContent>
+                                    </Card>
+                                )}
+                                {property.videoUrl && (
+                                    <Card>
+                                        <CardHeader><CardTitle className="font-headline text-2xl">Video Tour</CardTitle></CardHeader>
+                                        <CardContent>
+                                            <div className="aspect-video">
+                                                <iframe className="w-full h-full rounded-md border" src={property.videoUrl} title="Property Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
+                            </div>
+                        </>
+                    )}
 
                     {property.nearbyPlaces && property.nearbyPlaces.length > 0 && (
-                        <Card>
-                            <CardHeader><CardTitle className="font-headline text-2xl">What's Nearby?</CardTitle></CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                {property.nearbyPlaces.map(place => (
-                                    <div key={place.name} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                                        {placeIcons[place.type]}
-                                        <div>
-                                            <p className="font-semibold">{place.name}</p>
-                                            <p className="text-sm text-muted-foreground">{place.distance} away</p>
+                        <>
+                            <Separator />
+                            <Card>
+                                <CardHeader><CardTitle className="font-headline text-2xl">What's Nearby?</CardTitle></CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    {property.nearbyPlaces.map(place => (
+                                        <div key={place.name} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                                            {placeIcons[place.type] || <MapPin className="w-5 h-5 text-primary" />}
+                                            <div>
+                                                <p className="font-semibold">{place.name}</p>
+                                                <p className="text-sm text-muted-foreground">{place.distance} away</p>
+                                            </div>
                                         </div>
+                                    ))}
                                     </div>
-                                ))}
-                                </div>
-                            </CardContent>
-                        </Card>
+                                </CardContent>
+                            </Card>
+                        </>
                     )}
 
                     {/* Map */}
+                    <Separator />
                     <Card>
                         <CardHeader><CardTitle className="font-headline text-2xl">Location</CardTitle></CardHeader>
-                        <CardContent className="h-96 rounded-lg overflow-hidden">
+                        <CardContent className={cn("h-96 rounded-lg overflow-hidden border", !isMapsLoaded && "flex items-center justify-center")}>
                             <PropertyMap properties={[property]} />
                         </CardContent>
                     </Card>
@@ -176,8 +189,18 @@ export function PropertyDetail({ property }: { property: Property }) {
 
                 {/* Sidebar */}
                 <div className="lg:col-span-1 space-y-8">
+                    <Card className="sticky top-24">
+                        <CardHeader>
+                            <CardTitle className='font-headline text-3xl'>{formatPrice(property.price)}</CardTitle>
+                             <Badge variant="outline" className={cn('capitalize text-base w-fit', property.status === 'available' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-yellow-100 text-yellow-800 border-yellow-300')}>{property.status}</Badge>
+                        </CardHeader>
+                        <CardContent>
+                             {property.type === 'sale' && <MortgageCalculator propertyPrice={property.price} />}
+                        </CardContent>
+                    </Card>
+
                     {broker && (
-                        <Card className="sticky top-24">
+                        <Card>
                             <CardHeader className="text-center">
                                 {brokerAvatar &&
                                     <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20">
@@ -202,7 +225,6 @@ export function PropertyDetail({ property }: { property: Property }) {
                             </CardContent>
                         </Card>
                     )}
-                    {property.type === 'sale' && <MortgageCalculator propertyPrice={property.price} />}
                 </div>
             </div>
         </div>

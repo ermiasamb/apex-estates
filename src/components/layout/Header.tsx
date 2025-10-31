@@ -15,6 +15,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+
 
 const navLinks = [
   { href: '/search', label: 'Search' },
@@ -137,27 +139,9 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button className="hidden md:inline-flex">List your property</Button>
+          <Button className="hidden md:inline-flex" variant="secondary">List your property</Button>
         </div>
       </div>
     </header>
   );
 }
-
-// Basic Avatar components for the user dropdown
-const Avatar = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={cn("relative flex h-8 w-8 shrink-0 overflow-hidden rounded-full", className)}>
-    {children}
-  </div>
-);
-
-const AvatarImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => (
-  // eslint-disable-next-line @next/next/no-img-element
-  <img src={src} alt={alt} className={cn("aspect-square h-full w-full", className)} />
-);
-
-const AvatarFallback = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={cn("flex h-full w-full items-center justify-center rounded-full bg-muted", className)}>
-    {children}
-  </div>
-);

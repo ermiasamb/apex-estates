@@ -31,7 +31,7 @@ export function FavoriteButton({ propertyId, className }: FavoriteButtonProps) {
       size="icon"
       onClick={handleToggle}
       className={cn(
-        'rounded-full h-10 w-10 bg-white/70 backdrop-blur-sm hover:bg-white',
+        'rounded-full h-10 w-10 bg-black/30 backdrop-blur-sm hover:bg-white text-white hover:text-primary',
         className
       )}
       aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -39,7 +39,7 @@ export function FavoriteButton({ propertyId, className }: FavoriteButtonProps) {
       <Heart
         className={cn(
           'h-5 w-5 transition-all duration-300',
-          isFavorite ? 'text-red-500 fill-red-500' : 'text-primary/70'
+          isFavorite ? 'text-red-500 fill-red-500' : ''
         )}
       />
     </Button>
