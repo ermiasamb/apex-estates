@@ -23,11 +23,6 @@ const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').
   loading: () => <Skeleton className="h-96 w-full" />
 });
 
-// This is now a client component, but we can still fetch data on the server
-// by moving the data fetching logic to a server component and passing props,
-// or by fetching on the client (which we will do for simplicity here as data is static).
-// Note: generateStaticParams is not used in client components. We'll find another way to get the property.
-
 const placeIcons = {
     hospital: <Hospital className="w-5 h-5 text-primary" />,
     school: <School className="w-5 h-5 text-primary" />,
