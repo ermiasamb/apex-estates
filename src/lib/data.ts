@@ -49,6 +49,12 @@ export const properties: Property[] = [
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     brokerId: 'broker-1',
     status: 'available',
+    vrTourUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ",
+    nearbyPlaces: [
+        { name: 'UCLA Medical Center', type: 'hospital', distance: '1.2 miles' },
+        { name: 'Malibu High School', type: 'school', distance: '0.8 miles' },
+        { name: 'Nobu Malibu', type: 'restaurant', distance: '0.5 miles' },
+    ]
   },
   {
     id: 'prop-2',
