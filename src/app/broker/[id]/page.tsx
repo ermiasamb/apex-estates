@@ -10,13 +10,6 @@ import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/properties/PropertyCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-// generateStaticParams can be kept for static site generation, even in a client component.
-export async function generateStaticParams() {
-  return brokers.map((broker) => ({
-    id: broker.id,
-  }));
-}
-
 export default function BrokerProfilePage({ params }: { params: { id:string } }) {
   const broker = brokers.find((b) => b.id === params.id);
   if (!broker) {
