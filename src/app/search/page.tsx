@@ -6,10 +6,16 @@ import { properties as allProperties } from '@/lib/data';
 import type { Property } from '@/lib/types';
 import { PropertyCard } from '@/components/properties/PropertyCard';
 import { PropertyFilters } from '@/components/properties/PropertyFilters';
-import { PropertyMap } from '@/components/properties/PropertyMap';
 import { Button } from '@/components/ui/button';
 import { List, Map } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import dynamic from 'next/dynamic';
+
+const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(mod => mod.PropertyMap), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[60vh] lg:h-full w-full rounded-lg" />
+});
+
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -17,7 +23,7 @@ function SearchPageContent() {
 
   const [filters, setFilters] = useState({
     query: searchParams.get('q') || '',
-    type: (searchParams.get('type') as 'sale' | 'rent' | null),
+    type: (searchParams.get('type') as 'sale' | 'rent' | 'all' | null),
     minPrice: Number(searchParams.get('minPrice')) || 0,
     maxPrice: Number(searchParams.get('maxPrice')) || Infinity,
     bedrooms: 'any',
@@ -30,7 +36,7 @@ function SearchPageContent() {
       
       const queryLower = query.toLowerCase();
       const matchesQuery = !query || property.title.toLowerCase().includes(queryLower) || property.location.toLowerCase().includes(queryLower) || property.address.toLowerCase().includes(queryLower);
-      const matchesType = !type || property.type === type;
+      const matchesType = !type || type === 'all' || property.type === type;
       const matchesPrice = property.price >= minPrice && (maxPrice === Infinity || property.price <= maxPrice);
       const matchesBedrooms = bedrooms === 'any' || property.bedrooms >= Number(bedrooms);
       const matchesBathrooms = bathrooms === 'any' || property.bathrooms >= Number(bathrooms);
@@ -50,7 +56,7 @@ function SearchPageContent() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h1 className="text-2xl font-headline font-semibold">
-                {filters.type ? `${filters.type === 'sale' ? 'Homes For Sale' : 'Apartments For Rent'}` : 'All Properties'}
+                {filters.type && filters.type !== 'all' ? `${filters.type === 'sale' ? 'Homes For Sale' : 'Apartments For Rent'}` : 'All Properties'}
               </h1>
               <p className="text-muted-foreground">{filteredProperties.length} results found</p>
             </div>

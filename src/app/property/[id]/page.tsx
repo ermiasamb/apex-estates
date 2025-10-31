@@ -8,12 +8,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye } from 'lucide-react';
 import { PhotoGallery } from '@/components/properties/PhotoGallery';
-import { PropertyMap } from '@/components/properties/PropertyMap';
 import { FavoriteButton } from '@/components/properties/FavoriteButton';
 import { TrackView } from '@/components/properties/TrackView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MortgageCalculator } from '@/components/properties/MortgageCalculator';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(mod => mod.PropertyMap), {
+  ssr: false,
+  loading: () => <Skeleton className="h-96 w-full" />
+});
+
 
 export async function generateStaticParams() {
   return properties.map((property) => ({
