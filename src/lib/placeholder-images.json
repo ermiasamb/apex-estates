@@ -1,3 +1,142 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-image",
+      "description": "A beautiful modern house with a pool at dusk",
+      "imageUrl": "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2Rlcm4lMjBob3VzZXxlbnwwfHx8fDE3NjE5NDU1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern house"
+    },
+    {
+      "id": "property-1-ext",
+      "description": "Exterior of a modern villa with large windows",
+      "imageUrl": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtb2Rlcm4lMjB2aWxsYXxlbnwwfHx8fDE3NjE5NDM0NDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern villa"
+    },
+    {
+      "id": "property-1-int-1",
+      "description": "Living room of a modern villa with minimalist furniture",
+      "imageUrl": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bGl2aW5nJTIwcm9vbXxlbnwwfHx8fDE3NjE5MDQxNDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "living room"
+    },
+    {
+      "id": "property-1-int-2",
+      "description": "Spacious kitchen with a marble island",
+      "imageUrl": "https://images.unsplash.com/photo-1556912167-f556f1f39fdf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBraXRjaGVufGVufDB8fHx8MTc2MTg3NTg4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern kitchen"
+    },
+    {
+      "id": "property-1-plan",
+      "description": "Floor plan for a modern villa",
+      "imageUrl": "https://images.unsplash.com/photo-1721244653493-29609ecaded9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmbG9vciUyMHBsYW58ZW58MHx8fHwxNzYxOTIwMzY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "floor plan"
+    },
+    {
+      "id": "property-2-ext",
+      "description": "Exterior of a cozy downtown apartment building",
+      "imageUrl": "https://images.unsplash.com/photo-1534655610770-dd69616f05ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhcGFydG1lbnQlMjBidWlsZGluZ3xlbnwwfHx8fDE3NjE4NTQ2NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "apartment building"
+    },
+    {
+      "id": "property-2-int-1",
+      "description": "Living area of a chic downtown apartment",
+      "imageUrl": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NjE4MzM2NjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "apartment interior"
+    },
+    {
+      "id": "property-2-int-2",
+      "description": "Bedroom with a view of the city skyline",
+      "imageUrl": "https://images.unsplash.com/photo-1748959503873-c4598e3c28db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjaXR5JTIwYmVkcm9vbXxlbnwwfHx8fDE3NjE5NDU1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city bedroom"
+    },
+    {
+      "id": "property-2-plan",
+      "description": "Floor plan for a two-bedroom apartment",
+      "imageUrl": "https://images.unsplash.com/photo-1551250930-ace1ad395cea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxhcGFydG1lbnQlMjBwbGFufGVufDB8fHx8MTc2MTk0NTU4OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "apartment plan"
+    },
+    {
+      "id": "property-3-ext",
+      "description": "Exterior of a charming suburban house with a garden",
+      "imageUrl": "https://images.unsplash.com/photo-1592595896616-c37162298647?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdWJ1cmJhbiUyMGhvdXNlfGVufDB8fHx8MTc2MTkwODc5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "suburban house"
+    },
+    {
+      "id": "property-3-int-1",
+      "description": "Cozy living room with a fireplace",
+      "imageUrl": "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjb3p5JTIwbGl2aW5ncm9vbXxlbnwwfHx8fDE3NjE4MzkzNTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cozy livingroom"
+    },
+    {
+      "id": "property-3-plan",
+      "description": "Floor plan for a suburban family house",
+      "imageUrl": "https://images.unsplash.com/photo-1706164971299-cfa23ec76083?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxob3VzZSUyMGZsb29ycGxhbnxlbnwwfHx8fDE3NjE5NDU1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "house floorplan"
+    },
+    {
+      "id": "property-4-ext",
+      "description": "Penthouse apartment building exterior",
+      "imageUrl": "https://images.unsplash.com/photo-1577214582508-fdde28e64474?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxsdXh1cnklMjBwZW50aG91c2V8ZW58MHx8fHwxNzYxOTQzMTI2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "luxury penthouse"
+    },
+    {
+      "id": "property-4-int-1",
+      "description": "Penthouse living room with panoramic city views",
+      "imageUrl": "https://images.unsplash.com/photo-1611755489400-3c53602ab783?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZW50aG91c2UlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NjE5NDU1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "penthouse interior"
+    },
+    {
+      "id": "property-4-plan",
+      "description": "Floor plan for a luxury penthouse",
+      "imageUrl": "https://images.unsplash.com/photo-1596104514536-df3f26e750d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZW50aG91c2UlMjBmbG9vcnBsYW58ZW58MHx8fHwxNzYxOTQ1NTg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "penthouse floorplan"
+    },
+    {
+      "id": "property-5-ext",
+      "description": "Modern townhouse exterior",
+      "imageUrl": "https://images.unsplash.com/photo-1656712193274-d391a185fde6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0b3duaG91c2UlMjBleHRlcmlvcnxlbnwwfHx8fDE3NjE5NDU1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "townhouse exterior"
+    },
+    {
+      "id": "property-5-int-1",
+      "description": "Sleek and modern townhouse kitchen",
+      "imageUrl": "https://images.unsplash.com/photo-1693067171934-67aef5b65e0f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0b3duaG91c2UlMjBraXRjaGVufGVufDB8fHx8MTc2MTk0NTU4OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "townhouse kitchen"
+    },
+    {
+      "id": "property-5-plan",
+      "description": "Floor plan for a modern townhouse",
+      "imageUrl": "https://images.unsplash.com/photo-1695886517917-348d9e1059e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx0b3duaG91c2UlMjBmbG9vcnBsYW58ZW58MHx8fHwxNzYxOTQ1NTg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "townhouse floorplan"
+    },
+    {
+      "id": "property-6-ext",
+      "description": "Beachfront property with ocean view",
+      "imageUrl": "https://images.unsplash.com/photo-1756765738707-018ab0181bd8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiZWFjaGZyb250JTIwaG91c2V8ZW58MHx8fHwxNzYxOTQ1NTg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beachfront house"
+    },
+    {
+      "id": "property-6-int-1",
+      "description": "Interior of a beachfront house with large windows",
+      "imageUrl": "https://images.unsplash.com/photo-1585550134510-04f7a2072b20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiZWFjaGZyb250JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzYxOTQ1NTg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beachfront interior"
+    },
+    {
+      "id": "property-6-plan",
+      "description": "Floor plan for a beachfront house",
+      "imageUrl": "https://images.unsplash.com/photo-1662027573400-3875ef1de5ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiZWFjaGZyb250JTIwZmxvb3JwbGFufGVufDB8fHx8MTc2MTk0NTU4OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beachfront floorplan"
+    },
+    {
+      "id": "broker-1-avatar",
+      "description": "Avatar for broker Jane Doe",
+      "imageUrl": "https://images.unsplash.com/photo-1546961329-78bef0414d7c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2MTkwOTQyNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "broker-2-avatar",
+      "description": "Avatar for broker John Smith",
+      "imageUrl": "https://images.unsplash.com/photo-1636377985931-898218afd306?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE4ODE5NTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man portrait"
+    }
+  ]
 }
