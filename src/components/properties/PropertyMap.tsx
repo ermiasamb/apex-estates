@@ -1,3 +1,4 @@
+
 'use client';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
@@ -5,6 +6,7 @@ import "leaflet-defaulticon-compatibility";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import type { Property } from '@/lib/types';
 import { PropertyCard } from './PropertyCard';
+import { useMemo } from 'react';
 
 interface PropertyMapProps {
   properties: Property[];
@@ -15,8 +17,16 @@ export function PropertyMap({ properties }: PropertyMapProps) {
     ? properties[0].coordinates 
     : { lat: 34.0522, lng: -118.2437 };
 
+  const mapKey = useMemo(() => properties.map(p => p.id).join('-'), [properties]);
+
   return (
-    <MapContainer center={[defaultCenter.lat, defaultCenter.lng]} zoom={10} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+    <MapContainer 
+        key={mapKey}
+        center={[defaultCenter.lat, defaultCenter.lng]} 
+        zoom={10} 
+        scrollWheelZoom={false} 
+        style={{ height: '100%', width: '100%' }}
+    >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
