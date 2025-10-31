@@ -28,7 +28,7 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
     };
     
     const handleSelectChange = (name: keyof FilterState) => (value: string) => {
-        setFilters(prev => ({...prev, [name]: value === 'any' ? '' : value }));
+        setFilters(prev => ({...prev, [name]: value === 'all' ? null : value }));
     };
 
     const handleSliderChange = (values: number[]) => {
@@ -55,12 +55,12 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
                 
                 <div className="space-y-2">
                     <Label>Property Type</Label>
-                    <Select value={filters.type || ''} onValueChange={handleSelectChange('type')}>
+                    <Select value={filters.type || 'all'} onValueChange={handleSelectChange('type')}>
                         <SelectTrigger>
                             <SelectValue placeholder="Any Type" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Any Type</SelectItem>
+                            <SelectItem value="all">Any Type</SelectItem>
                             <SelectItem value="sale">For Sale</SelectItem>
                             <SelectItem value="rent">For Rent</SelectItem>
                         </SelectContent>
