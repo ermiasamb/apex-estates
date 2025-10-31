@@ -98,6 +98,7 @@ export function Header() {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <Button className="hidden md:inline-flex rounded-full" variant="ghost">List your property</Button>
           <Button asChild variant="ghost" size="icon">
             <Link href="/favorites">
               <Heart className="h-5 w-5" />
@@ -139,7 +140,6 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button className="hidden md:inline-flex" variant="secondary">List your property</Button>
         </div>
       </div>
     </header>

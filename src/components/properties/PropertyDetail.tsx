@@ -16,15 +16,12 @@ import { MortgageCalculator } from '@/components/properties/MortgageCalculator';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Property } from '@/lib/types';
-import { useIsMapsApiLoaded } from './MapsApiProvider';
 import { cn } from '@/lib/utils';
-
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(mod => mod.PropertyMap), {
   ssr: false,
   loading: () => <Skeleton className="h-96 w-full rounded-lg" />
 });
-
 
 const placeIcons: Record<string, React.ReactElement> = {
     hospital: <Hospital className="w-5 h-5 text-primary" />,
@@ -36,7 +33,6 @@ export function PropertyDetail({ property }: { property: Property }) {
   const broker = brokers.find((b) => b.id === property.brokerId);
   const brokerAvatar = placeholderImages.find(p => p.id === broker?.avatarId);
   const floorPlanImage = placeholderImages.find(p => p.id === property.floorPlanId);
-  const isMapsLoaded = useIsMapsApiLoaded();
 
   const formatPrice = (price: number) => {
     if (property.type === 'rent') {
@@ -58,26 +54,28 @@ export function PropertyDetail({ property }: { property: Property }) {
 
         <div className="container mx-auto px-4 py-8 md:py-12">
             {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 items-start">
                 <div className="lg:col-span-2 space-y-8">
                     {/* Header */}
-                    <div className="mb-6">
+                    <div className="space-y-4">
                         <div className="flex justify-between items-start">
-                            <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">{property.title}</h1>
+                            <div>
+                                <h1 className="text-3xl md:text-4xl font-headline font-bold text-foreground">{property.title}</h1>
+                                <div className="flex items-center gap-2 text-muted-foreground mt-2">
+                                    <MapPin className="w-5 h-5" />
+                                    <span className="text-base hover:underline cursor-pointer">{property.address}</span>
+                                </div>
+                            </div>
                             <FavoriteButton propertyId={property.id} className="h-12 w-12 bg-card border shadow-sm" />
                         </div>
-                        <div className="flex items-center gap-2 text-muted-foreground mt-2">
-                            <MapPin className="w-5 h-5" />
-                            <span className="text-lg">{property.address}</span>
-                        </div>
-                    </div>
 
-                    {/* Details Bar */}
-                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center my-6">
-                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary">{property.bedrooms}</div><div className="text-sm text-muted-foreground">Beds</div></div>
-                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary">{property.bathrooms}</div><div className="text-sm text-muted-foreground">Baths</div></div>
-                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary">{property.area.toLocaleString()}</div><div className="text-sm text-muted-foreground">sqft</div></div>
-                        <div className="p-4 bg-muted/50 rounded-lg"><div className="font-bold text-2xl text-primary capitalize">{property.type}</div><div className="text-sm text-muted-foreground">Type</div></div>
+                         {/* Details Bar */}
+                        <div className="flex items-center gap-6 text-foreground text-sm">
+                            <div className="flex items-center gap-2"><BedDouble className="w-5 h-5 text-primary"/> <span>{property.bedrooms} Bedrooms</span></div>
+                            <div className="flex items-center gap-2"><Bath className="w-5 h-5 text-primary"/> <span>{property.bathrooms} Bathrooms</span></div>
+                            <div className="flex items-center gap-2"><SquareGanttChart className="w-5 h-5 text-primary"/> <span>{property.area.toLocaleString()} sqft</span></div>
+                            <div className="flex items-center gap-2"><Building className="w-5 h-5 text-primary"/> <span className='capitalize'>{property.type}</span></div>
+                        </div>
                     </div>
 
                     <Separator />
@@ -92,9 +90,9 @@ export function PropertyDetail({ property }: { property: Property }) {
                      {propertyAmenities.length > 0 && (
                         <>
                             <Separator />
-                            <Card>
-                                <CardHeader><CardTitle className="font-headline text-2xl">Amenities</CardTitle></CardHeader>
-                                <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
+                             <div>
+                                <h3 className='font-headline text-2xl mb-4'>What this place offers</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4 mt-4">
                                     {propertyAmenities.map(amenity => (
                                     <div key={amenity.name} className="flex items-center gap-3">
                                         <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary">
@@ -103,28 +101,26 @@ export function PropertyDetail({ property }: { property: Property }) {
                                         <span className="font-medium">{amenity.name}</span>
                                     </div>
                                     ))}
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
                         </>
                      )}
 
                     {property.vrTourUrl && (
                         <>
                             <Separator />
-                            <Card>
-                                <CardHeader><CardTitle className="font-headline text-2xl flex items-center gap-3"><Eye/> 360° Virtual Tour</CardTitle></CardHeader>
-                                <CardContent>
-                                    <div className="aspect-video w-full rounded-lg overflow-hidden border">
-                                        <iframe
-                                            className="w-full h-full"
-                                            src={property.vrTourUrl}
-                                            title="360 Virtual Tour"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
-                                            allowFullScreen
-                                        ></iframe>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                             <div>
+                                <h3 className='font-headline text-2xl mb-4 flex items-center gap-3'><Eye/> 360° Virtual Tour</h3>
+                                <div className="aspect-video w-full rounded-lg overflow-hidden border mt-4">
+                                    <iframe
+                                        className="w-full h-full"
+                                        src={property.vrTourUrl}
+                                        title="360 Virtual Tour"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
+                                        allowFullScreen
+                                    ></iframe>
+                                </div>
+                            </div>
                         </>
                     )}
                     
@@ -134,22 +130,18 @@ export function PropertyDetail({ property }: { property: Property }) {
                             <Separator />
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                                 {floorPlanImage && (
-                                    <Card>
-                                        <CardHeader><CardTitle className="font-headline text-2xl">Floor Plan</CardTitle></CardHeader>
-                                        <CardContent>
-                                            <Image src={floorPlanImage.imageUrl} alt="Floor Plan" width={800} height={600} className="rounded-md w-full border" data-ai-hint={floorPlanImage.imageHint} />
-                                        </CardContent>
-                                    </Card>
+                                    <div>
+                                        <h3 className="font-headline text-2xl mb-4">Floor Plan</h3>
+                                        <Image src={floorPlanImage.imageUrl} alt="Floor Plan" width={800} height={600} className="rounded-md w-full border mt-4" data-ai-hint={floorPlanImage.imageHint} />
+                                    </div>
                                 )}
                                 {property.videoUrl && (
-                                    <Card>
-                                        <CardHeader><CardTitle className="font-headline text-2xl">Video Tour</CardTitle></CardHeader>
-                                        <CardContent>
-                                            <div className="aspect-video">
-                                                <iframe className="w-full h-full rounded-md border" src={property.videoUrl} title="Property Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
+                                    <div>
+                                        <h3 className="font-headline text-2xl mb-4">Video Tour</h3>
+                                        <div className="aspect-video mt-4">
+                                            <iframe className="w-full h-full rounded-md border" src={property.videoUrl} title="Property Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </>
@@ -158,73 +150,76 @@ export function PropertyDetail({ property }: { property: Property }) {
                     {property.nearbyPlaces && property.nearbyPlaces.length > 0 && (
                         <>
                             <Separator />
-                            <Card>
-                                <CardHeader><CardTitle className="font-headline text-2xl">What's Nearby?</CardTitle></CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    {property.nearbyPlaces.map(place => (
-                                        <div key={place.name} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                                            {placeIcons[place.type] || <MapPin className="w-5 h-5 text-primary" />}
-                                            <div>
-                                                <p className="font-semibold">{place.name}</p>
-                                                <p className="text-sm text-muted-foreground">{place.distance} away</p>
-                                            </div>
+                            <div>
+                                <h3 className='font-headline text-2xl mb-4'>What's Nearby?</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                                {property.nearbyPlaces.map(place => (
+                                    <div key={place.name} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                                        {placeIcons[place.type] || <MapPin className="w-5 h-5 text-primary" />}
+                                        <div>
+                                            <p className="font-semibold">{place.name}</p>
+                                            <p className="text-sm text-muted-foreground">{place.distance} away</p>
                                         </div>
-                                    ))}
                                     </div>
-                                </CardContent>
-                            </Card>
+                                ))}
+                                </div>
+                            </div>
                         </>
                     )}
 
                     {/* Map */}
                     <Separator />
-                    <Card>
-                        <CardHeader><CardTitle className="font-headline text-2xl">Location</CardTitle></CardHeader>
-                        <CardContent className={cn("h-96 rounded-lg overflow-hidden border", !isMapsLoaded && "flex items-center justify-center")}>
+                    <div>
+                        <h3 className="font-headline text-2xl mb-4">Location</h3>
+                         <div className={cn("h-96 rounded-lg overflow-hidden border mt-4", "flex items-center justify-center")}>
                             <PropertyMap properties={[property]} />
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Sidebar */}
-                <div className="lg:col-span-1 space-y-8">
-                    <Card className="sticky top-24">
-                        <CardHeader>
-                            <CardTitle className='font-headline text-3xl'>{formatPrice(property.price)}</CardTitle>
-                             <Badge variant="outline" className={cn('capitalize text-base w-fit', property.status === 'available' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-yellow-100 text-yellow-800 border-yellow-300')}>{property.status}</Badge>
-                        </CardHeader>
-                        <CardContent>
-                             {property.type === 'sale' && <MortgageCalculator propertyPrice={property.price} />}
-                        </CardContent>
-                    </Card>
-
-                    {broker && (
-                        <Card>
-                            <CardHeader className="text-center">
-                                {brokerAvatar &&
-                                    <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20">
-                                        <AvatarImage src={brokerAvatar.imageUrl} alt={broker.name} data-ai-hint={brokerAvatar.imageHint}/>
-                                        <AvatarFallback>{broker.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                    </Avatar>
-                                }
-                                <CardTitle className="font-headline text-2xl">{broker.name}</CardTitle>
-                                <p className="text-muted-foreground">Listing Agent</p>
+                <div className="lg:col-span-1">
+                    <div className="sticky top-24 space-y-8">
+                        <Card className="shadow-lg rounded-xl border-2">
+                            <CardHeader>
+                                <CardTitle className='font-headline text-3xl'>{formatPrice(property.price)}</CardTitle>
+                                <Badge variant="outline" className={cn('capitalize text-base w-fit', property.status === 'available' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-yellow-100 text-yellow-800 border-yellow-300')}>{property.status}</Badge>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <Button className="w-full" asChild size="lg">
-                                    <a href={`tel:${broker.phone}`}><Phone className='mr-2' />{broker.phone}</a>
-                                </Button>
-                                <Button className="w-full" variant="secondary" asChild size="lg">
-                                    <a href={`mailto:${broker.email}`}><Mail className='mr-2' />Email Agent</a>
-                                </Button>
-                                <Separator />
-                                <Button className="w-full" variant="outline" asChild>
-                                    <Link href={`/broker/${broker.id}`}>View Profile & Listings</Link>
-                                </Button>
+                            <CardContent>
+                                {broker && (
+                                    <div className="space-y-4">
+                                        <Button className="w-full" asChild size="lg">
+                                            <a href={`tel:${broker.phone}`}><Phone className='mr-2' />Call Agent</a>
+                                        </Button>
+                                        <Button className="w-full" variant="secondary" asChild size="lg">
+                                            <a href={`mailto:${broker.email}`}><Mail className='mr-2' />Email Agent</a>
+                                        </Button>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
-                    )}
+
+                        {property.type === 'sale' && <MortgageCalculator propertyPrice={property.price} />}
+
+                        {broker && (
+                            <Card className="text-center">
+                                <CardContent className="p-6">
+                                    <p className="text-sm text-muted-foreground mb-4">Listed by</p>
+                                    {brokerAvatar &&
+                                        <Avatar className="w-16 h-16 mx-auto mb-2">
+                                            <AvatarImage src={brokerAvatar.imageUrl} alt={broker.name} data-ai-hint={brokerAvatar.imageHint}/>
+                                            <AvatarFallback>{broker.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                        </Avatar>
+                                    }
+                                    <p className="font-semibold">{broker.name}</p>
+                                    <p className="text-xs text-muted-foreground">Listing Agent</p>
+                                    <Button className="w-full mt-4" variant="outline" asChild>
+                                        <Link href={`/broker/${broker.id}`}>View Profile</Link>
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -45,7 +45,7 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
     const bathOptions = ['any', '1', '2', '3+'];
 
     return (
-        <Card className="sticky top-24">
+        <Card className="sticky top-24 shadow-md rounded-xl">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">Filter Properties</CardTitle>
             </CardHeader>
@@ -87,7 +87,7 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
                     <Label>Bedrooms</Label>
                      <div className="flex flex-wrap gap-2">
                          {bedOptions.map(val => (
-                             <Button key={val} size="sm" variant={filters.bedrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bedrooms')(val)} className="flex-1">{val}</Button>
+                             <Button key={val} size="sm" variant={filters.bedrooms === val ? 'default': 'outline'} onClick={() => setFilters(prev => ({...prev, bedrooms: val}))} className="flex-1 rounded-full">{val === 'any' ? 'Any' : `${val}`}</Button>
                          ))}
                      </div>
                 </div>
@@ -96,7 +96,7 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
                     <Label>Bathrooms</Label>
                      <div className="flex flex-wrap gap-2">
                          {bathOptions.map(val => (
-                             <Button key={val} size="sm" variant={filters.bathrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bathrooms')(val)} className="flex-1">{val}</Button>
+                             <Button key={val} size="sm" variant={filters.bathrooms === val ? 'default': 'outline'} onClick={() => setFilters(prev => ({...prev, bathrooms: val}))} className="flex-1 rounded-full">{val === 'any' ? 'Any' : `${val}`}</Button>
                          ))}
                      </div>
                 </div>

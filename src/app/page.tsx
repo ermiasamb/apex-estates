@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-16 md:gap-24">
-      <section className="relative h-[70vh] min-h-[500px] w-full flex items-center justify-center">
+      <section className="relative h-[60vh] min-h-[400px] md:h-[70vh] md:min-h-[600px] w-full flex items-center justify-center flex-col">
         {heroImage && (
           <Image
             src={heroImage.imageUrl}
@@ -27,19 +27,17 @@ export default function Home() {
             data-ai-hint={heroImage.imageHint}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/20" />
-        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 text-center text-white p-4 mt-auto w-full">
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 flex flex-col items-center justify-center gap-6 text-center text-white p-4">
           <h1 className="text-4xl md:text-6xl font-headline font-bold text-shadow-lg">
             Find Your Dream Home
           </h1>
           <p className="max-w-2xl text-lg md:text-xl text-neutral-200 text-shadow">
             Discover a curated selection of the finest properties for sale and rent. Your next chapter starts here.
           </p>
-          <Card className="w-full max-w-4xl bg-background/90 backdrop-blur-sm border-white/20 shadow-2xl">
-            <CardContent className="p-4 md:p-6">
-              <PropertySearchForm />
-            </CardContent>
-          </Card>
+        </div>
+        <div className="relative z-10 w-full max-w-5xl mt-8 px-4">
+            <PropertySearchForm />
         </div>
       </section>
 
@@ -56,7 +54,7 @@ export default function Home() {
           ))}
         </div>
         <div className="text-center mt-12">
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" className='rounded-full'>
                 <Link href="/search">View All Properties</Link>
             </Button>
         </div>

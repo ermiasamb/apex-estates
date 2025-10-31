@@ -23,9 +23,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+    <Card className="flex flex-col h-full overflow-hidden group transition-all duration-300 border-none shadow-none hover:shadow-2xl rounded-xl">
       <CardHeader className="p-0 relative">
-        <Link href={`/property/${property.id}`} className="block overflow-hidden">
+        <Link href={`/property/${property.id}`} className="block overflow-hidden rounded-xl">
           <div className="aspect-[4/3] w-full relative">
             {image ? (
               <Image
@@ -41,45 +41,45 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 <span className="text-muted-foreground">No Image</span>
               </div>
             )}
-             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
           </div>
         </Link>
-        <div className="absolute top-4 left-4 flex gap-2">
-            <Badge variant={property.type === 'sale' ? 'default' : 'secondary'} className="capitalize bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary/50">
-                For {property.type}
-            </Badge>
-        </div>
         <div className="absolute top-3 right-3">
             <FavoriteButton propertyId={property.id} />
-        </div>
-         <div className="absolute bottom-4 left-4">
-            <p className="font-bold text-2xl text-white text-shadow">{formatPrice(property.price)}</p>
         </div>
       </CardHeader>
       <Link href={`/property/${property.id}`} className="flex flex-col flex-grow">
         <CardContent className="p-4 flex-grow">
-            <CardTitle className="text-xl font-headline font-bold mt-1 mb-2 truncate" title={property.title}>
-                {property.title}
-            </CardTitle>
-            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+            <div className='flex justify-between items-start'>
+                <p className="font-semibold text-lg truncate" title={property.title}>
+                    {property.title}
+                </p>
+                <Badge variant={property.type === 'sale' ? 'default' : 'secondary'} className="capitalize shrink-0">
+                    For {property.type}
+                </Badge>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1">
                 <MapPin className="w-4 h-4 shrink-0" />
                 <span className="truncate">{property.address}</span>
             </div>
+            <p className="font-bold text-lg mt-2">{formatPrice(property.price)}</p>
         </CardContent>
-        <CardFooter className="p-4 bg-muted/30 border-t">
+        <CardFooter className="p-4 pt-0">
             <div className="flex justify-between items-center w-full text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-                <BedDouble className="w-5 h-5 text-primary/70" />
-                <span>{property.bedrooms} Beds</span>
-            </div>
-            <div className="flex items-center gap-2">
-                <Bath className="w-5 h-5 text-primary/70" />
-                <span>{property.bathrooms} Baths</span>
-            </div>
-            <div className="flex items-center gap-2">
-                <SquareGanttChart className="w-5 h-5 text-primary/70" />
-                <span>{property.area.toLocaleString()} sqft</span>
-            </div>
+                <div className="flex items-center gap-2">
+                    <BedDouble className="w-5 h-5 text-primary/70" />
+                    <span className="font-medium text-foreground">{property.bedrooms}</span>
+                    <span className='hidden sm:inline'>Beds</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Bath className="w-5 h-5 text-primary/70" />
+                    <span className="font-medium text-foreground">{property.bathrooms}</span>
+                    <span className='hidden sm:inline'>Baths</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <SquareGanttChart className="w-5 h-5 text-primary/70" />
+                    <span className="font-medium text-foreground">{property.area.toLocaleString()}</span>
+                    <span className='hidden sm:inline'>sqft</span>
+                </div>
             </div>
         </CardFooter>
       </Link>
