@@ -1,6 +1,5 @@
 'use client';
-import { properties, brokers, amenities as allAmenities } from '@/lib/data';
-import { notFound } from 'next/navigation';
+import { brokers, amenities as allAmenities } from '@/lib/data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { placeholderImages } from '@/lib/placeholder-images.json';
@@ -16,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { MortgageCalculator } from '@/components/properties/MortgageCalculator';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Property } from '@/lib/types';
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(mod => mod.PropertyMap), {
   ssr: false,
@@ -28,13 +28,7 @@ const placeIcons = {
     restaurant: <UtensilsIcon className="w-5 h-5 text-primary" />,
 };
 
-export function PropertyDetail({ id }: { id: string }) {
-  const property = properties.find((p) => p.id === id);
-
-  if (!property) {
-    notFound();
-  }
-
+export function PropertyDetail({ property }: { property: Property }) {
   const broker = brokers.find((b) => b.id === property.brokerId);
   const brokerAvatar = placeholderImages.find(p => p.id === broker?.avatarId);
   const floorPlanImage = placeholderImages.find(p => p.id === property.floorPlanId);

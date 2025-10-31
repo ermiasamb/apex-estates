@@ -1,6 +1,5 @@
 'use client';
-import { brokers, properties } from '@/lib/data';
-import { notFound } from 'next/navigation';
+import { properties } from '@/lib/data';
 import { placeholderImages } from '@/lib/placeholder-images.json';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -8,13 +7,9 @@ import { Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/properties/PropertyCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import type { Broker } from '@/lib/types';
 
-export function BrokerDetail({ id }: { id: string }) {
-  const broker = brokers.find((b) => b.id === id);
-  if (!broker) {
-    notFound();
-  }
-
+export function BrokerDetail({ broker }: { broker: Broker }) {
   const brokerProperties = properties.filter(p => p.brokerId === broker.id);
   const avatar = placeholderImages.find(p => p.id === broker.avatarId);
 
