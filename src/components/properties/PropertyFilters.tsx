@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup } from '@/components/ui/radio-group';
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 type FilterState = {
     query: string;
@@ -27,7 +28,7 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
     };
     
     const handleSelectChange = (name: keyof FilterState) => (value: string) => {
-        setFilters(prev => ({...prev, [name]: value}));
+        setFilters(prev => ({...prev, [name]: value === 'any' ? '' : value }));
     };
 
     const handleSliderChange = (values: number[]) => {
@@ -35,6 +36,7 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
     };
 
     const formatPrice = (value: number) => {
+        if (value >= 10000000) return 'Any';
         if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
         if (value >= 1000) return `$${(value / 1000)}k`;
         return `$${value}`;
@@ -68,7 +70,7 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
                 <div className="space-y-2">
                     <Label>Price Range</Label>
                     <Slider 
-                        defaultValue={[0, 5000000]} 
+                        defaultValue={[0, 10000000]} 
                         max={10000000} 
                         step={100000} 
                         onValueChange={handleSliderChange}
@@ -81,22 +83,18 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
 
                 <div className="space-y-2">
                     <Label>Bedrooms</Label>
-                     <RadioGroup value={filters.bedrooms} onValueChange={handleSelectChange('bedrooms')} className="flex space-x-2">
+                     <RadioGroup value={filters.bedrooms} onValueChange={handleSelectChange('bedrooms')} className="flex flex-wrap gap-2">
                          {['any', '1', '2', '3', '4+'].map(val => (
-                             <div key={val} className="flex items-center space-x-2">
-                                <Button size="sm" variant={filters.bedrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bedrooms')(val)}>{val === '4+' ? '4+' : val}</Button>
-                             </div>
+                             <Button key={val} size="sm" variant={filters.bedrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bedrooms')(val)}>{val === '4+' ? '4+' : val}</Button>
                          ))}
                      </RadioGroup>
                 </div>
 
                 <div className="space-y-2">
                     <Label>Bathrooms</Label>
-                     <RadioGroup value={filters.bathrooms} onValueChange={handleSelectChange('bathrooms')} className="flex space-x-2">
+                     <RadioGroup value={filters.bathrooms} onValueChange={handleSelectChange('bathrooms')} className="flex flex-wrap gap-2">
                          {['any', '1', '2', '3+'].map(val => (
-                             <div key={val} className="flex items-center space-x-2">
-                                <Button size="sm" variant={filters.bathrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bathrooms')(val)}>{val}</Button>
-                             </div>
+                            <Button key={val} size="sm" variant={filters.bathrooms === val ? 'default': 'outline'} onClick={() => handleSelectChange('bathrooms')(val)}>{val}</Button>
                          ))}
                      </RadioGroup>
                 </div>
@@ -105,7 +103,3 @@ export function PropertyFilters({ filters, setFilters }: PropertyFiltersProps) {
         </Card>
     );
 }
-
-const Button = ({ children, ...props }: React.ComponentProps<typeof import('@/components/ui/button').Button>) => (
-    <import('@/components/ui/button').Button {...props}>{children}</import('@/components/ui/button').Button>
-)
