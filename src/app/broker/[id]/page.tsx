@@ -1,4 +1,3 @@
-'use client';
 import { BrokerDetail } from "@/components/brokers/BrokerDetail";
 import { brokers } from "@/lib/data";
 import { notFound } from "next/navigation";

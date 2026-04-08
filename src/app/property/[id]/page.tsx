@@ -1,4 +1,3 @@
-'use client';
 import { PropertyDetail } from "@/components/properties/PropertyDetail";
 import { properties } from "@/lib/data";
 import { notFound } from "next/navigation";
