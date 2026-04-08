@@ -16,7 +16,7 @@ const containerStyle = {
   height: '100%',
 };
 
-export function PropertyMap({ properties }: PropertyMapProps) {
+export default function PropertyMap({ properties }: PropertyMapProps) {
   const isLoaded = useIsMapsApiLoaded();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
