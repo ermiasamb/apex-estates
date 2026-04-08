@@ -3,11 +3,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BedDouble, Bath, SquareGanttChart, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BedDouble, Bath, SquareGanttChart, MapPin } from 'lucide-react';
 import type { Property } from '@/lib/types';
 import { placeholderImages } from '@/lib/placeholder-images.json';
 import { FavoriteButton } from './FavoriteButton';
-import { Carousel, CarouselContent, CarouselItem, useCarousel } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, useCarousel, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 import React from 'react';
 
@@ -85,22 +85,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
               )
             ))}
           </CarouselContent>
-          <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button
-                onClick={(e) => { e.preventDefault(); (e.currentTarget.parentElement?.parentElement?.querySelector('.embla-carousel-prev') as HTMLElement)?.click(); }}
-                className="absolute left-2 bg-white/80 hover:bg-white text-foreground rounded-full h-8 w-8 flex items-center justify-center shadow-md"
-                aria-label="Previous image"
-                >
-                <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-                onClick={(e) => { e.preventDefault(); (e.currentTarget.parentElement?.parentElement?.querySelector('.embla-carousel-next') as HTMLElement)?.click(); }}
-                className="absolute right-2 bg-white/80 hover:bg-white text-foreground rounded-full h-8 w-8 flex items-center justify-center shadow-md"
-                aria-label="Next image"
-                >
-                <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
+          <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-white/80 p-0 text-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 hover:bg-white disabled:opacity-0" />
+          <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-white/80 p-0 text-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 hover:bg-white disabled:opacity-0" />
           <CarouselDots />
         </Carousel>
 

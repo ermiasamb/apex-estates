@@ -6,6 +6,8 @@ import {
   CarouselContent,
   CarouselItem,
   useCarousel,
+  CarouselNext,
+  CarouselPrevious,
 } from '@/components/ui/carousel';
 import type { ImageCategory, ImagePlaceholder } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
@@ -106,14 +108,8 @@ export function PhotoGallery({ imageIds }: PhotoGalleryProps) {
                 )
                 ))}
             </CarouselContent>
-            <button onClick={(e) => { e.preventDefault(); (e.currentTarget.parentElement?.querySelector('.embla-carousel-prev') as HTMLElement)?.click(); }} className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/30 text-white rounded-full h-10 w-10 flex items-center justify-center backdrop-blur-sm hover:bg-white hover:text-black transition-all">
-                <span className="sr-only">Previous</span>
-                &lt;
-            </button>
-             <button onClick={(e) => { e.preventDefault(); (e.currentTarget.parentElement?.querySelector('.embla-carousel-next') as HTMLElement)?.click(); }} className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/30 text-white rounded-full h-10 w-10 flex items-center justify-center backdrop-blur-sm hover:bg-white hover:text-black transition-all">
-                <span className="sr-only">Next</span>
-                &gt;
-            </button>
+            <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full border-0 bg-black/30 p-0 text-white backdrop-blur-sm transition-all hover:bg-white hover:text-black" />
+            <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full border-0 bg-black/30 p-0 text-white backdrop-blur-sm transition-all hover:bg-white hover:text-black" />
             <CarouselDots />
             </Carousel>
         </TabsContent>

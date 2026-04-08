@@ -6,7 +6,7 @@ import { placeholderImages } from '@/lib/placeholder-images.json';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye, History, BarChart, ShieldCheck, Heart } from 'lucide-react';
+import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye, History, Share2, Heart } from 'lucide-react';
 import { PhotoGallery } from '@/components/properties/PhotoGallery';
 import { FavoriteButton } from './FavoriteButton';
 import { TrackView } from '@/components/properties/TrackView';
@@ -22,6 +22,7 @@ import { EnvironmentalInfo } from './EnvironmentalInfo';
 import { AskQuestionForm } from './AskQuestionForm';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { PriceHistoryChart } from './PriceHistoryChart';
+import { ShareDialog } from './ShareDialog';
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), {
   ssr: false,
@@ -71,7 +72,10 @@ export function PropertyDetail({ property }: { property: Property }) {
                                     <span className="text-base hover:underline cursor-pointer">{property.address}</span>
                                 </div>
                             </div>
-                            <FavoriteButton propertyId={property.id} className="h-12 w-12 bg-card border shadow-sm" />
+                            <div className="flex items-center gap-2">
+                                <ShareDialog property={property} />
+                                <FavoriteButton propertyId={property.id} className="h-12 w-12 bg-card border shadow-sm" />
+                            </div>
                         </div>
 
                          {/* Details Bar */}

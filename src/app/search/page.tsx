@@ -10,10 +10,11 @@ import { Button } from '@/components/ui/button';
 import { List, Map } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import dynamic from 'next/dynamic';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), {
   ssr: false,
-  loading: () => <Skeleton className="h-[60vh] lg:h-full w-full rounded-lg" />
+  loading: () => <Skeleton className="h-full w-full" />
 });
 
 
@@ -23,7 +24,7 @@ function SearchPageContent() {
 
   const [filters, setFilters] = useState({
     query: searchParams.get('q') || '',
-    type: (searchParams.get('type') as 'sale' | 'rent' | 'all' | null),
+    type: (searchParams.get('type') as 'sale' | 'rent' | 'all' | null) || 'all',
     minPrice: Number(searchParams.get('minPrice')) || 0,
     maxPrice: Number(searchParams.get('maxPrice')) || Infinity,
     bedrooms: 'any',
@@ -39,8 +40,8 @@ function SearchPageContent() {
       const matchesQuery = !query || property.title.toLowerCase().includes(queryLower) || property.location.toLowerCase().includes(queryLower) || property.address.toLowerCase().includes(queryLower);
       const matchesType = !type || type === 'all' || property.type === type;
       const matchesPrice = property.price >= minPrice && (maxPrice === Infinity || property.price <= maxPrice);
-      const matchesBedrooms = bedrooms === 'any' || property.bedrooms >= Number(bedrooms);
-      const matchesBathrooms = bathrooms === 'any' || property.bathrooms >= Number(bathrooms);
+      const matchesBedrooms = bedrooms === 'any' || property.bedrooms >= Number(bedrooms.replace('+', ''));
+      const matchesBathrooms = bathrooms === 'any' || property.bathrooms >= Number(bathrooms.replace('+', ''));
       const matchesNearby = nearby.length === 0 || nearby.every(amenity => property.nearbyPlaces?.some(place => place.type === amenity));
       
       return matchesQuery && matchesType && matchesPrice && matchesBedrooms && matchesBathrooms && matchesNearby;
@@ -48,52 +49,69 @@ function SearchPageContent() {
   }, [filters]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col lg:flex-row gap-8">
-        <aside className="w-full lg:w-1/4 xl:w-1/5">
-          <PropertyFilters filters={filters} setFilters={setFilters} />
-        </aside>
-
-        <main className="w-full lg:w-3/4 xl:w-4/5">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h1 className="text-2xl font-headline font-semibold">
-                {filters.type && filters.type !== 'all' ? `${filters.type === 'sale' ? 'Homes For Sale' : 'Apartments For Rent'}` : 'All Properties'}
-              </h1>
-              <p className="text-muted-foreground">{filteredProperties.length} results found</p>
-            </div>
-            <div className="hidden sm:flex items-center gap-2 p-1 bg-muted rounded-lg">
-                <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('list')}>
-                    <List className="h-4 w-4 mr-2" />
-                    List
-                </Button>
-                <Button variant={viewMode === 'map' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('map')}>
-                    <Map className="h-4 w-4 mr-2" />
-                    Map
-                </Button>
-            </div>
+    <div className="flex flex-col h-[calc(100vh-65px)]">
+      <div className="container mx-auto px-4 pt-4 border-b">
+        <PropertyFilters filters={filters} setFilters={setFilters} />
+        <div className="flex justify-between items-center my-4">
+          <div>
+            <h1 className="text-xl font-headline font-semibold">
+                Real Estate & Homes For Sale
+            </h1>
+            <p className="text-muted-foreground text-sm">{filteredProperties.length} results</p>
           </div>
-          
-          {viewMode === 'list' ? (
-            filteredProperties.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredProperties.map((property) => (
-                    <PropertyCard key={property.id} property={property} />
-                ))}
-                </div>
-            ) : (
-                <div className="text-center py-20 bg-muted rounded-lg">
-                    <h2 className="text-xl font-semibold">No properties found</h2>
-                    <p className="text-muted-foreground mt-2">Try adjusting your search filters.</p>
-                </div>
-            )
-          ) : (
-            <div className="h-[60vh] lg:h-full w-full rounded-lg overflow-hidden border">
-              <PropertyMap properties={filteredProperties} />
-            </div>
-          )}
-        </main>
+          <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
+              <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('list')}>
+                  <List className="h-4 w-4 mr-2" />
+                  List
+              </Button>
+              <Button variant={viewMode === 'map' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('map')}>
+                  <Map className="h-4 w-4 mr-2" />
+                  Map
+              </Button>
+          </div>
+        </div>
       </div>
+      
+      {viewMode === 'list' ? (
+        <ScrollArea className="flex-grow">
+            <div className="container mx-auto px-4 py-6">
+                {filteredProperties.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredProperties.map((property) => (
+                        <PropertyCard key={property.id} property={property} />
+                    ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-20 bg-muted rounded-lg">
+                        <h2 className="text-xl font-semibold">No properties found</h2>
+                        <p className="text-muted-foreground mt-2">Try adjusting your search filters.</p>
+                    </div>
+                )}
+            </div>
+        </ScrollArea>
+      ) : (
+        <div className="flex-grow flex">
+          <ScrollArea className="w-full lg:w-3/5 xl:w-1/2">
+            <div className='p-4'>
+                 {filteredProperties.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {filteredProperties.map((property) => (
+                        <PropertyCard key={property.id} property={property} />
+                    ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-20 bg-muted rounded-lg">
+                        <h2 className="text-xl font-semibold">No properties found</h2>
+                        <p className="text-muted-foreground mt-2">Try adjusting your search filters.</p>
+                    </div>
+                )}
+            </div>
+          </ScrollArea>
+          <div className="hidden lg:block lg:w-2/5 xl:w-1/2 h-full">
+            <PropertyMap properties={filteredProperties} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -110,11 +128,9 @@ export default function SearchPage() {
 function SearchPageSkeleton() {
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col lg:flex-row gap-8">
-                <aside className="w-full lg:w-1/4 xl:w-1/5">
-                    <Skeleton className="h-[600px] w-full" />
-                </aside>
-                <main className="w-full lg:w-3/4 xl:w-4/5">
+            <div className="flex flex-col gap-8">
+                <Skeleton className="h-12 w-full" />
+                <main>
                     <div className="flex justify-between items-center mb-4">
                         <div className="space-y-2">
                             <Skeleton className="h-8 w-48" />
