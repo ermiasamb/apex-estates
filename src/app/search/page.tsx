@@ -9,14 +9,7 @@ import { PropertyFilters } from '@/components/properties/PropertyFilters';
 import { Button } from '@/components/ui/button';
 import { List, Map } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import dynamic from 'next/dynamic';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />
-});
-
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -108,7 +101,9 @@ function SearchPageContent() {
             </div>
           </ScrollArea>
           <div className="hidden lg:block lg:w-2/5 xl:w-1/2 h-full">
-            <PropertyMap properties={filteredProperties} />
+            <div className="h-full w-full bg-muted flex items-center justify-center">
+                <p className="text-muted-foreground">Map view is temporarily unavailable.</p>
+            </div>
           </div>
         </div>
       )}

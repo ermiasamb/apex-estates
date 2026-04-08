@@ -3,7 +3,6 @@ import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/toaster';
-import { MapsApiProvider } from '@/components/properties/MapsApiProvider';
 
 export const metadata: Metadata = {
   title: 'Apex Estates | Premium Real Estate',
@@ -27,12 +26,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
-        <MapsApiProvider>
-          <Header />
-          <main className="min-h-[calc(100vh-200px)]">{children}</main>
-          <Footer />
-          <Toaster />
-        </MapsApiProvider>
+        <Header />
+        <main className="min-h-[calc(100vh-200px)]">{children}</main>
+        <Footer />
+        <Toaster />
       </body>
     </html>
   );

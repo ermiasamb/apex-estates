@@ -13,7 +13,6 @@ import { TrackView } from '@/components/properties/TrackView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MortgageCalculator } from '@/components/properties/MortgageCalculator';
-import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Property } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -23,11 +22,6 @@ import { AskQuestionForm } from './AskQuestionForm';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { PriceHistoryChart } from './PriceHistoryChart';
 import { ShareDialog } from './ShareDialog';
-
-const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-96 w-full rounded-lg" />
-});
 
 const placeIcons: Record<string, React.ReactElement> = {
     hospital: <Hospital className="w-5 h-5 text-primary" />,
@@ -202,8 +196,8 @@ export function PropertyDetail({ property }: { property: Property }) {
                     <Separator />
                     <div>
                         <h3 className="font-headline text-2xl mb-4">Location</h3>
-                         <div className={cn("h-96 rounded-lg overflow-hidden border mt-4", "flex items-center justify-center")}>
-                            <PropertyMap properties={[property]} />
+                         <div className={cn("h-96 rounded-lg overflow-hidden border mt-4", "bg-muted flex items-center justify-center")}>
+                            <p className="text-muted-foreground">Map view is temporarily unavailable.</p>
                         </div>
                     </div>
                 </div>
