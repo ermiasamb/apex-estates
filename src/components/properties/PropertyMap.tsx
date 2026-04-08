@@ -5,7 +5,7 @@ import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import type { Property } from '@/lib/types';
 import { PropertyCard } from './PropertyCard';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 // This is the fix for the marker icon issue with Webpack
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -29,28 +29,33 @@ interface PropertyMapProps {
 function MapViewUpdater({ center, zoom }: { center: [number, number], zoom: number }) {
     const map = useMap();
     useEffect(() => {
-        map.setView(center, zoom);
+        if (map) {
+            map.setView(center, zoom);
+        }
     }, [center, zoom, map]);
     return null;
 }
 
 export default function PropertyMap({ properties }: PropertyMapProps) {
-  const defaultCenter = properties.length > 0
-    ? properties[0].coordinates
-    : { lat: 34.0522, lng: -118.2437 };
+  const center: [number, number] = useMemo(() => {
+    const defaultCenter = properties.length > 0
+      ? properties[0].coordinates
+      : { lat: 34.0522, lng: -118.2437 };
+    return [defaultCenter.lat, defaultCenter.lng];
+  }, [properties]);
 
-  // Leaflet uses [lat, lng] array, not object.
-  const defaultPosition: [number, number] = [defaultCenter.lat, defaultCenter.lng];
-  const zoomLevel = properties.length > 1 ? 10 : 13;
+  const zoomLevel = useMemo(() => (properties.length > 1 ? 10 : 13), [properties]);
+  
+  const initialCenter: [number, number] = [34.0522, -118.2437];
 
   return (
     <MapContainer
-        center={defaultPosition}
-        zoom={zoomLevel}
+        center={initialCenter}
+        zoom={10}
         scrollWheelZoom={false}
         style={{ height: '100%', width: '100%' }}
     >
-        <MapViewUpdater center={defaultPosition} zoom={zoomLevel} />
+        <MapViewUpdater center={center} zoom={zoomLevel} />
         <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
