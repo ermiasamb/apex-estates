@@ -22,6 +22,12 @@ import { AskQuestionForm } from './AskQuestionForm';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { PriceHistoryChart } from './PriceHistoryChart';
 import { ShareDialog } from './ShareDialog';
+import dynamic from 'next/dynamic';
+
+const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(m => m.PropertyMap), {
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />
+});
 
 const placeIcons: Record<string, React.ReactElement> = {
     hospital: <Hospital className="w-5 h-5 text-primary" />,
@@ -196,8 +202,8 @@ export function PropertyDetail({ property }: { property: Property }) {
                     <Separator />
                     <div>
                         <h3 className="font-headline text-2xl mb-4">Location</h3>
-                         <div className={cn("h-96 rounded-lg overflow-hidden border mt-4", "bg-muted flex items-center justify-center")}>
-                            <p className="text-muted-foreground">Map view is temporarily unavailable.</p>
+                         <div className={cn("h-96 rounded-lg overflow-hidden border mt-4")}>
+                            <PropertyMap properties={[property]} />
                         </div>
                     </div>
                 </div>
