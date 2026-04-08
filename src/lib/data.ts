@@ -1,5 +1,6 @@
 import type { Property, Broker, Amenity } from './types';
 import { Wifi, ParkingSquare, PawPrint, VenetianMask, Utensils, Droplets, Snowflake, Dumbbell, Sun } from 'lucide-react';
+import { sub } from 'date-fns';
 
 export const amenities: Amenity[] = [
   { name: 'WiFi', icon: Wifi },
@@ -43,7 +44,7 @@ export const properties: Property[] = [
     bedrooms: 5,
     bathrooms: 6,
     area: 5200,
-    imageIds: ['property-1-ext', 'property-1-int-1', 'property-1-int-2'],
+    imageIds: ['property-1-ext', 'property-1-int-1', 'property-1-int-2', 'property-1-int-3', 'property-1-bath'],
     amenities: ['WiFi', 'Parking', 'Pool', 'Air Conditioning', 'Kitchen'],
     floorPlanId: 'property-1-plan',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
@@ -54,7 +55,23 @@ export const properties: Property[] = [
         { name: 'UCLA Medical Center', type: 'hospital', distance: '1.2 miles' },
         { name: 'Malibu High School', type: 'school', distance: '0.8 miles' },
         { name: 'Nobu Malibu', type: 'restaurant', distance: '0.5 miles' },
-    ]
+        { name: 'Malibu Country Mart', type: 'mall', distance: '1.0 miles' },
+    ],
+    postedOn: sub(new Date(), { days: 10 }).toISOString(),
+    views: 1254,
+    saves: 231,
+    priceHistory: [
+      { date: sub(new Date(), { months: 6 }).toISOString(), price: 4750000 },
+      { date: sub(new Date(), { months: 3 }).toISOString(), price: 4600000 },
+      { date: sub(new Date(), { months: 1 }).toISOString(), price: 4500000 },
+    ],
+    environmentalInfo: {
+      walkScore: 78,
+      bikeScore: 62,
+      roadSafety: 85,
+      floodRisk: 10,
+      noiseLevel: 30,
+    }
   },
   {
     id: 'prop-2',
@@ -68,11 +85,28 @@ export const properties: Property[] = [
     bedrooms: 2,
     bathrooms: 2,
     area: 1800,
-    imageIds: ['property-2-ext', 'property-2-int-1', 'property-2-int-2'],
+    imageIds: ['property-2-ext', 'property-2-int-1', 'property-2-int-2', 'property-2-int-3'],
     amenities: ['WiFi', 'Air Conditioning', 'Pet Friendly', 'Gym'],
     floorPlanId: 'property-2-plan',
     brokerId: 'broker-2',
     status: 'available',
+    nearbyPlaces: [
+        { name: 'NYU Langone', type: 'hospital', distance: '1.5 miles' },
+        { name: 'Washington Square Park', type: 'playground', distance: '0.5 miles' },
+        { name: 'Prince St Station', type: 'transport', distance: '0.1 miles' },
+        { name: 'Equinox SoHo', type: 'gym', distance: '0.3 miles' },
+    ],
+    postedOn: sub(new Date(), { days: 5 }).toISOString(),
+    views: 890,
+    saves: 150,
+    priceHistory: [],
+    environmentalInfo: {
+        walkScore: 99,
+        bikeScore: 92,
+        roadSafety: 70,
+        floodRisk: 30,
+        noiseLevel: 75,
+    }
   },
   {
     id: 'prop-3',
@@ -86,11 +120,30 @@ export const properties: Property[] = [
     bedrooms: 4,
     bathrooms: 3,
     area: 2600,
-    imageIds: ['property-3-ext', 'property-3-int-1'],
+    imageIds: ['property-3-ext', 'property-3-int-1', 'property-3-int-2'],
     amenities: ['Parking', 'Pet Friendly', 'Kitchen', 'Air Conditioning', 'WiFi'],
     floorPlanId: 'property-3-plan',
     brokerId: 'broker-1',
     status: 'available',
+    nearbyPlaces: [
+        { name: 'Austin ISD', type: 'school', distance: '0.5 miles' },
+        { name: 'H-E-B', type: 'mall', distance: '1 mile' },
+        { name: 'Shipe Park', type: 'playground', distance: '0.2 miles' },
+    ],
+    postedOn: sub(new Date(), { days: 32 }).toISOString(),
+    views: 2300,
+    saves: 410,
+    priceHistory: [
+        { date: sub(new Date(), { months: 4 }).toISOString(), price: 820000 },
+        { date: sub(new Date(), { months: 2 }).toISOString(), price: 850000 },
+    ],
+    environmentalInfo: {
+        walkScore: 82,
+        bikeScore: 88,
+        roadSafety: 90,
+        floodRisk: 20,
+        noiseLevel: 45,
+    }
   },
   {
     id: 'prop-4',
@@ -104,12 +157,28 @@ export const properties: Property[] = [
     bedrooms: 4,
     bathrooms: 5,
     area: 4500,
-    imageIds: ['property-4-ext', 'property-4-int-1'],
+    imageIds: ['property-4-ext', 'property-4-int-1', 'property-4-int-2'],
     amenities: ['Pool', 'Gym', 'Rooftop Deck', 'Parking', 'Air Conditioning', 'WiFi'],
     floorPlanId: 'property-4-plan',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     brokerId: 'broker-2',
     status: 'sold',
+    nearbyPlaces: [],
+    postedOn: sub(new Date(), { days: 90 }).toISOString(),
+    views: 15000,
+    saves: 1200,
+    priceHistory: [
+      { date: sub(new Date(), { months: 12 }).toISOString(), price: 12000000 },
+      { date: sub(new Date(), { months: 6 }).toISOString(), price: 12800000 },
+      { date: sub(new Date(), { months: 3 }).toISOString(), price: 12500000 },
+    ],
+    environmentalInfo: {
+        walkScore: 88,
+        bikeScore: 76,
+        roadSafety: 75,
+        floodRisk: 65,
+        noiseLevel: 60,
+    }
   },
   {
     id: 'prop-5',
@@ -123,11 +192,23 @@ export const properties: Property[] = [
     bedrooms: 3,
     bathrooms: 2,
     area: 1600,
-    imageIds: ['property-5-ext', 'property-5-int-1'],
+    imageIds: ['property-5-ext', 'property-5-int-1', 'property-5-int-2'],
     amenities: ['WiFi', 'Kitchen', 'Balcony', 'Parking'],
     floorPlanId: 'property-5-plan',
     brokerId: 'broker-1',
     status: 'available',
+    nearbyPlaces: [],
+     postedOn: sub(new Date(), { days: 14 }).toISOString(),
+    views: 640,
+    saves: 95,
+    priceHistory: [],
+    environmentalInfo: {
+        walkScore: 97,
+        bikeScore: 94,
+        roadSafety: 72,
+        floodRisk: 15,
+        noiseLevel: 68,
+    }
   },
   {
     id: 'prop-6',
@@ -141,10 +222,25 @@ export const properties: Property[] = [
     bedrooms: 4,
     bathrooms: 4,
     area: 3100,
-    imageIds: ['property-6-ext', 'property-6-int-1'],
+    imageIds: ['property-6-ext', 'property-6-int-1', 'property-6-int-2'],
     amenities: ['Balcony', 'Parking', 'Kitchen', 'WiFi'],
     floorPlanId: 'property-6-plan',
     brokerId: 'broker-2',
     status: 'rented',
+    nearbyPlaces: [],
+    postedOn: sub(new Date(), { days: 45 }).toISOString(),
+    views: 4500,
+    saves: 880,
+    priceHistory: [
+       { date: sub(new Date(), { months: 6 }).toISOString(), price: 6000000 },
+       { date: sub(new Date(), { months: 2 }).toISOString(), price: 6200000 },
+    ],
+    environmentalInfo: {
+        walkScore: 85,
+        bikeScore: 80,
+        roadSafety: 88,
+        floodRisk: 55,
+        noiseLevel: 50,
+    }
   },
 ];

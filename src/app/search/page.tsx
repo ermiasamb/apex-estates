@@ -11,7 +11,7 @@ import { List, Map } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import dynamic from 'next/dynamic';
 
-const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(mod => mod.PropertyMap), {
+const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), {
   ssr: false,
   loading: () => <Skeleton className="h-[60vh] lg:h-full w-full rounded-lg" />
 });
@@ -28,11 +28,12 @@ function SearchPageContent() {
     maxPrice: Number(searchParams.get('maxPrice')) || Infinity,
     bedrooms: 'any',
     bathrooms: 'any',
+    nearby: [] as string[],
   });
 
   const filteredProperties = useMemo(() => {
     return allProperties.filter((property) => {
-      const { query, type, minPrice, maxPrice, bedrooms, bathrooms } = filters;
+      const { query, type, minPrice, maxPrice, bedrooms, bathrooms, nearby } = filters;
       
       const queryLower = query.toLowerCase();
       const matchesQuery = !query || property.title.toLowerCase().includes(queryLower) || property.location.toLowerCase().includes(queryLower) || property.address.toLowerCase().includes(queryLower);
@@ -40,8 +41,9 @@ function SearchPageContent() {
       const matchesPrice = property.price >= minPrice && (maxPrice === Infinity || property.price <= maxPrice);
       const matchesBedrooms = bedrooms === 'any' || property.bedrooms >= Number(bedrooms);
       const matchesBathrooms = bathrooms === 'any' || property.bathrooms >= Number(bathrooms);
+      const matchesNearby = nearby.length === 0 || nearby.every(amenity => property.nearbyPlaces?.some(place => place.type === amenity));
       
-      return matchesQuery && matchesType && matchesPrice && matchesBedrooms && matchesBathrooms;
+      return matchesQuery && matchesType && matchesPrice && matchesBedrooms && matchesBathrooms && matchesNearby;
     });
   }, [filters]);
 

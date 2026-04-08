@@ -6,9 +6,9 @@ import { placeholderImages } from '@/lib/placeholder-images.json';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye } from 'lucide-react';
+import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye, History, BarChart, ShieldCheck, Heart } from 'lucide-react';
 import { PhotoGallery } from '@/components/properties/PhotoGallery';
-import { FavoriteButton } from '@/components/properties/FavoriteButton';
+import { FavoriteButton } from './FavoriteButton';
 import { TrackView } from '@/components/properties/TrackView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -17,8 +17,13 @@ import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Property } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
+import { EnvironmentalInfo } from './EnvironmentalInfo';
+import { AskQuestionForm } from './AskQuestionForm';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { PriceHistoryChart } from './PriceHistoryChart';
 
-const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(mod => mod.PropertyMap), {
+const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), {
   ssr: false,
   loading: () => <Skeleton className="h-96 w-full rounded-lg" />
 });
@@ -70,11 +75,16 @@ export function PropertyDetail({ property }: { property: Property }) {
                         </div>
 
                          {/* Details Bar */}
-                        <div className="flex items-center gap-6 text-foreground text-sm">
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-foreground text-sm">
                             <div className="flex items-center gap-2"><BedDouble className="w-5 h-5 text-primary"/> <span>{property.bedrooms} Bedrooms</span></div>
                             <div className="flex items-center gap-2"><Bath className="w-5 h-5 text-primary"/> <span>{property.bathrooms} Bathrooms</span></div>
                             <div className="flex items-center gap-2"><SquareGanttChart className="w-5 h-5 text-primary"/> <span>{property.area.toLocaleString()} sqft</span></div>
                             <div className="flex items-center gap-2"><Building className="w-5 h-5 text-primary"/> <span className='capitalize'>{property.type}</span></div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-muted-foreground text-sm">
+                            <div className="flex items-center gap-2"><CalendarDays className="w-5 h-5 "/> <span>Posted {formatDistanceToNow(new Date(property.postedOn), { addSuffix: true })}</span></div>
+                            <div className="flex items-center gap-2"><Eye className="w-5 h-5 "/> <span>{property.views.toLocaleString()} views</span></div>
+                            <div className="flex items-center gap-2"><Heart className="w-5 h-5 "/> <span>{property.saves.toLocaleString()} saves</span></div>
                         </div>
                     </div>
 
@@ -105,6 +115,23 @@ export function PropertyDetail({ property }: { property: Property }) {
                             </div>
                         </>
                      )}
+                     
+                    {property.priceHistory.length > 0 && (
+                        <>
+                            <Separator />
+                            <Accordion type="single" collapsible>
+                                <AccordionItem value="price-history">
+                                    <AccordionTrigger className='text-2xl font-headline flex items-center gap-3 hover:no-underline'>
+                                        <History /> Price History
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <PriceHistoryChart data={property.priceHistory} />
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                        </>
+                    )}
+
 
                     {property.vrTourUrl && (
                         <>
@@ -186,18 +213,11 @@ export function PropertyDetail({ property }: { property: Property }) {
                                 <Badge variant="outline" className={cn('capitalize text-base w-fit', property.status === 'available' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-yellow-100 text-yellow-800 border-yellow-300')}>{property.status}</Badge>
                             </CardHeader>
                             <CardContent>
-                                {broker && (
-                                    <div className="space-y-4">
-                                        <Button className="w-full" asChild size="lg">
-                                            <a href={`tel:${broker.phone}`}><Phone className='mr-2' />Call Agent</a>
-                                        </Button>
-                                        <Button className="w-full" variant="secondary" asChild size="lg">
-                                            <a href={`mailto:${broker.email}`}><Mail className='mr-2' />Email Agent</a>
-                                        </Button>
-                                    </div>
-                                )}
+                                {broker && <AskQuestionForm />}
                             </CardContent>
                         </Card>
+                        
+                        <EnvironmentalInfo info={property.environmentalInfo} />
 
                         {property.type === 'sale' && <MortgageCalculator propertyPrice={property.price} />}
 
@@ -213,7 +233,15 @@ export function PropertyDetail({ property }: { property: Property }) {
                                     }
                                     <p className="font-semibold">{broker.name}</p>
                                     <p className="text-xs text-muted-foreground">Listing Agent</p>
-                                    <Button className="w-full mt-4" variant="outline" asChild>
+                                    <div className='flex gap-2 mt-4'>
+                                        <Button className="w-full" asChild size="sm">
+                                            <a href={`tel:${broker.phone}`}><Phone className='mr-2' />Call</a>
+                                        </Button>
+                                        <Button className="w-full" variant="secondary" asChild size="sm">
+                                            <a href={`mailto:${broker.email}`}><Mail className='mr-2' />Email</a>
+                                        </Button>
+                                    </div>
+                                    <Button className="w-full mt-2" variant="outline" asChild size="sm">
                                         <Link href={`/broker/${broker.id}`}>View Profile</Link>
                                     </Button>
                                 </CardContent>

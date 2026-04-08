@@ -20,7 +20,26 @@ export interface Property {
   status: 'available' | 'sold' | 'rented';
   vrTourUrl?: string;
   nearbyPlaces?: NearbyPlace[];
+  postedOn: string; // ISO date string
+  views: number;
+  saves: number;
+  priceHistory: PriceHistoryEntry[];
+  environmentalInfo: EnvironmentalInfo;
 }
+
+export interface PriceHistoryEntry {
+    date: string; // ISO date string
+    price: number;
+}
+
+export interface EnvironmentalInfo {
+    walkScore: number;
+    bikeScore: number;
+    roadSafety: number;
+    floodRisk: number;
+    noiseLevel: number;
+}
+
 
 export interface Broker {
   id: string;
@@ -35,8 +54,10 @@ export interface Amenity {
   icon: LucideIcon;
 }
 
+export type NearbyPlaceType = 'hospital' | 'school' | 'restaurant' | 'church' | 'playground' | 'transport' | 'gym' | 'spa' | 'mall';
+
 export interface NearbyPlace {
     name: string;
-    type: 'hospital' | 'school' | 'restaurant';
+    type: NearbyPlaceType;
     distance: string;
 }
