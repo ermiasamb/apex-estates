@@ -19,6 +19,8 @@ import {
   Send,
 } from 'lucide-react';
 import type { Property } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import { Label } from '../ui/label';
 
 const WhatsAppIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
@@ -27,33 +29,45 @@ const WhatsAppIcon = () => (
 
 export function ShareDialog({ property }: { property: Property }) {
   const { toast } = useToast();
-  const propertyUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const shareText = `Check out this property: ${property.title}`;
+  const [propertyUrl, setPropertyUrl] = useState('');
+  const [shareOptions, setShareOptions] = useState<any[]>([]);
+
+  useEffect(() => {
+    const url = window.location.href;
+    setPropertyUrl(url);
+    const shareText = `Check out this property: ${property.title}`;
+    
+    const options = [
+      { name: 'Copy Link', icon: Copy, action: () => {
+        navigator.clipboard.writeText(url);
+        toast({ title: 'Link copied to clipboard!' });
+      }},
+      { name: 'Email', icon: Mail, action: () => window.open(`mailto:?subject=${encodeURIComponent(shareText)}&body=${encodeURIComponent(url)}`) },
+      { name: 'WhatsApp', icon: WhatsAppIcon, action: () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)} ${encodeURIComponent(url)}`, '_blank') },
+      { name: 'Telegram', icon: Send, action: () => window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`, '_blank') },
+      { name: 'X (Twitter)', icon: Twitter, action: () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`, '_blank') },
+      { name: 'LinkedIn', icon: Linkedin, action: () => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank') },
+    ];
+
+    if (navigator.share) {
+        options.splice(1, 0, { name: 'Web Share', icon: Share2, action: async () => {
+            try {
+                await navigator.share({ title: property.title, text: shareText, url: url });
+            } catch (error) {
+                console.error("Web Share API error:", error);
+                toast({ variant: 'destructive', title: 'Could not open share dialog.'})
+            }
+        }});
+    }
+    setShareOptions(options);
+
+  }, [property.title, toast]);
+
 
   const copyLink = () => {
     navigator.clipboard.writeText(propertyUrl);
     toast({ title: 'Link copied to clipboard!' });
   };
-
-  const shareOptions = [
-    { name: 'Copy Link', icon: Copy, action: copyLink },
-    { name: 'Web Share', icon: Share2, action: async () => {
-        if(navigator.share) {
-            try {
-                await navigator.share({ title: property.title, text: shareText, url: propertyUrl });
-            } catch (error) {
-                console.error("Web Share API error:", error);
-            }
-        } else {
-            toast({ variant: 'destructive', title: 'Web Share not supported on your browser.'})
-        }
-    }},
-    { name: 'Email', icon: Mail, action: () => window.open(`mailto:?subject=${encodeURIComponent(shareText)}&body=${encodeURIComponent(propertyUrl)}`) },
-    { name: 'WhatsApp', icon: WhatsAppIcon, action: () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)} ${encodeURIComponent(propertyUrl)}`, '_blank') },
-    { name: 'Telegram', icon: Send, action: () => window.open(`https://t.me/share/url?url=${encodeURIComponent(propertyUrl)}&text=${encodeURIComponent(shareText)}`, '_blank') },
-    { name: 'X (Twitter)', icon: Twitter, action: () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(propertyUrl)}&text=${encodeURIComponent(shareText)}`, '_blank') },
-    { name: 'LinkedIn', icon: Linkedin, action: () => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(propertyUrl)}`, '_blank') },
-  ];
 
   return (
     <Dialog>
@@ -69,7 +83,6 @@ export function ShareDialog({ property }: { property: Property }) {
         <div className="space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
             {shareOptions.map((option) => (
-                (option.name === 'Web Share' && typeof navigator.share === 'undefined') ? null :
               <div key={option.name}>
                 <Button variant="outline" size="icon" className="w-16 h-16 rounded-xl" onClick={option.action}>
                   <option.icon />
