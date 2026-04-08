@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { EnvironmentalInfo as EnvInfoType } from "@/lib/types";
-import { Walking, Bike, ShieldCheck, CloudRain, Waves } from "lucide-react";
+import { Footprints, Bike, ShieldCheck, CloudRain, Waves } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface EnvironmentalInfoProps {
@@ -10,7 +10,7 @@ interface EnvironmentalInfoProps {
 }
 
 const scoreInfo = {
-    walkScore: { label: 'Walk Score', icon: Walking, description: 'How walkable is this area?' },
+    walkScore: { label: 'Walk Score', icon: Footprints, description: 'How walkable is this area?' },
     bikeScore: { label: 'Bike Score', icon: Bike, description: 'How bikeable is this area?' },
     roadSafety: { label: 'Road Safety', icon: ShieldCheck, description: 'Safety rating for nearby roads.' },
     floodRisk: { label: 'Flood Risk', icon: CloudRain, description: 'Risk of flooding in this area.' },
