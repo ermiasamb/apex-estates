@@ -6,7 +6,7 @@ import { placeholderImages } from '@/lib/placeholder-images.json';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye, History, Share2, Heart } from 'lucide-react';
+import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye, History, Share2, Heart, Home } from 'lucide-react';
 import { PhotoGallery } from '@/components/properties/PhotoGallery';
 import { FavoriteButton } from './FavoriteButton';
 import { TrackView } from '@/components/properties/TrackView';
@@ -84,6 +84,7 @@ export function PropertyDetail({ property }: { property: Property }) {
                             <div className="flex items-center gap-2"><Bath className="w-5 h-5 text-primary"/> <span>{property.bathrooms} Bathrooms</span></div>
                             <div className="flex items-center gap-2"><SquareGanttChart className="w-5 h-5 text-primary"/> <span>{property.area.toLocaleString()} sqft</span></div>
                             <div className="flex items-center gap-2"><Building className="w-5 h-5 text-primary"/> <span className='capitalize'>{property.type}</span></div>
+                            <div className="flex items-center gap-2"><Home className="w-5 h-5 text-primary"/> <span className='capitalize'>{property.category}</span></div>
                         </div>
                         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-muted-foreground text-sm">
                             <div className="flex items-center gap-2"><CalendarDays className="w-5 h-5 "/> <span>Posted {formatDistanceToNow(new Date(property.postedOn), { addSuffix: true })}</span></div>

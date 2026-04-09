@@ -1,10 +1,13 @@
 import type { LucideIcon } from 'lucide-react';
 
+export type PropertyCategory = 'apartment' | 'condominium' | 'villa' | 'house' | 'townhouse' | 'land';
+
 export interface Property {
   id: string;
   title: string;
   description: string;
   type: 'sale' | 'rent';
+  category: PropertyCategory;
   price: number;
   location: string;
   address: string;
