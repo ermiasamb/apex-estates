@@ -3,6 +3,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import { useMapsApi } from './MapsApiProvider';
 import { Skeleton } from '../ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 interface LocationPickerProps {
   initialPosition: { lat: number; lng: number };
@@ -13,6 +14,7 @@ export function LocationPicker({ initialPosition, onLocationChange }: LocationPi
   const isLoaded = useMapsApi();
   const [markerPosition, setMarkerPosition] = useState(initialPosition);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isLoaded && !geocoderRef.current) {
@@ -50,11 +52,17 @@ export function LocationPicker({ initialPosition, onLocationChange }: LocationPi
 
           } else {
              onLocationChange({ ...newPos, address: 'Address not found', cityState: '' });
+             console.error(`Geocode was not successful for the following reason: ${status}`);
+             toast({
+                variant: 'destructive',
+                title: 'Geocoding Service Error',
+                description: 'Could not fetch address. Please ensure the Geocoding API is enabled for your API key in the Google Cloud Console.',
+             });
           }
         });
       }
     }
-  }, [onLocationChange]);
+  }, [onLocationChange, toast]);
 
   if (!isLoaded) {
     return <Skeleton className="w-full h-full" />;

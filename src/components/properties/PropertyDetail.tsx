@@ -12,15 +12,12 @@ import { FavoriteButton } from './FavoriteButton';
 import { TrackView } from '@/components/properties/TrackView';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { MortgageCalculator } from '@/components/properties/MortgageCalculator';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Property } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
-import { EnvironmentalInfo } from './EnvironmentalInfo';
 import { AskQuestionForm } from './AskQuestionForm';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
-import { PriceHistoryChart } from './PriceHistoryChart';
 import { ShareDialog } from './ShareDialog';
 import dynamic from 'next/dynamic';
 
@@ -28,6 +25,40 @@ const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').
     ssr: false,
     loading: () => <Skeleton className="h-full w-full" />
 });
+
+const MortgageCalculator = dynamic(() => import('@/components/properties/MortgageCalculator').then(m => m.MortgageCalculator), {
+    ssr: false,
+    loading: () => (
+        <Card>
+            <CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader>
+            <CardContent className="space-y-4">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-10 w-full" />
+            </CardContent>
+        </Card>
+    ),
+});
+
+const EnvironmentalInfo = dynamic(() => import('./EnvironmentalInfo').then(m => m.EnvironmentalInfo), {
+    loading: () => (
+        <Card>
+            <CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader>
+            <CardContent className="space-y-4">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+            </CardContent>
+        </Card>
+    ),
+});
+
+const PriceHistoryChart = dynamic(() => import('./PriceHistoryChart').then(m => m.PriceHistoryChart), {
+    loading: () => <Skeleton className="h-64 w-full" />,
+});
+
 
 const placeIcons: Record<string, React.ReactElement> = {
     hospital: <Hospital className="w-5 h-5 text-primary" />,
