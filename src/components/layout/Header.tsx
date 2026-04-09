@@ -91,14 +91,14 @@ export function Header() {
                     </Link>
                   ))}
                 </div>
-                 <Button className='w-full' size="lg">List your property</Button>
+                 <Button asChild className='w-full' size="lg"><Link href="/add-listing">List your property</Link></Button>
               </nav>
             </SheetContent>
           </Sheet>
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button className="hidden md:inline-flex rounded-full" variant="ghost">List your property</Button>
+          <Button asChild className="hidden md:inline-flex rounded-full" variant="ghost"><Link href="/add-listing">List your property</Link></Button>
           <Button asChild variant="ghost" size="icon">
             <Link href="/favorites">
               <Heart className="h-5 w-5" />
