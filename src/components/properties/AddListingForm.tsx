@@ -21,6 +21,7 @@ import { ImageDropzone } from './ImageDropzone';
 import { useState } from 'react';
 import Image from 'next/image';
 import { ImageCategory } from '@/lib/placeholder-images';
+import { propertyService } from '@/services/property-service';
 
 const nearbyPlaceTypes: NearbyPlaceType[] = ['hospital', 'school', 'restaurant', 'church', 'playground', 'transport', 'gym', 'spa', 'mall'];
 const propertyCategories: PropertyCategory[] = ['apartment', 'condominium', 'villa', 'house', 'townhouse', 'land'];
@@ -91,6 +92,7 @@ const formSchema = z.object({
 
 export function AddListingForm() {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -131,15 +133,27 @@ export function AddListingForm() {
   const [floorPlanPreview, setFloorPlanPreview] = useState<string | null>(null);
   const [videoFilePreview, setVideoFilePreview] = useState<string | null>(null);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // In a real app, you would handle file uploads to a storage service
-    // and then save the property data to your database.
-    toast({
-      title: 'Property Listed!',
-      description: `"${values.title}" has been successfully added.`,
-    });
-    // form.reset(); // Commented out to inspect form values after submission
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      await propertyService.createProperty(values);
+      toast({
+        title: 'Property Submitted!',
+        description: `"${values.title}" has been successfully submitted for review.`,
+      });
+      form.reset();
+      // Clear previews
+      setFloorPlanPreview(null);
+      setVideoFilePreview(null);
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Submission Failed',
+        description: error.message || 'There was a problem with your submission.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -444,7 +458,9 @@ export function AddListingForm() {
             </CardContent>
         </Card>
 
-        <Button type="submit" size="lg" className="w-full">Create Listing</Button>
+        <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Submitting...' : 'Create Listing'}
+        </Button>
       </form>
     </Form>
   );

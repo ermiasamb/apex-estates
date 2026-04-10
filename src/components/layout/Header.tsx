@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/shared/Logo';
-import { Heart, Menu, User, X } from 'lucide-react';
+import { Heart, Menu, User, LogOut, UserPlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,12 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-
+import { useAuth } from '@/providers/auth-provider';
+import { Skeleton } from '../ui/skeleton';
 
 const navLinks = [
   { href: '/search', label: 'Search' },
@@ -28,6 +29,62 @@ const navLinks = [
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { user, logout, loading } = useAuth();
+
+  const UserMenu = () => {
+    if (loading) {
+      return <Skeleton className="h-10 w-24 rounded-md" />;
+    }
+
+    if (!user) {
+      return (
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost">
+            <Link href="/login">Log In</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/register">Sign Up</Link>
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Avatar>
+              <AvatarImage src={`https://i.pravatar.cc/150?u=${user.email}`} alt={user.name} />
+              <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{user.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {user.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/profile"><User className="mr-2 h-4 w-4" />Profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/favorites"><Heart className="mr-2 h-4 w-4" />Favorites</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={logout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -68,78 +125,59 @@ export function Header() {
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <SheetHeader>
-                    <SheetTitle className="sr-only">Main Menu</SheetTitle>
-                </SheetHeader>
-              <nav className="flex flex-col h-full">
-                <div className="flex items-center justify-between border-b pb-4">
-                  <Link href="/" className="flex items-center space-x-2">
-                    <Logo />
-                    <span className="font-bold font-headline text-lg">Apex Estates</span>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] flex flex-col">
+              <div className="flex items-center justify-between border-b pb-4">
+                <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Logo />
+                  <span className="font-bold font-headline text-lg">Apex Estates</span>
+                </Link>
+              </div>
+              <nav className="flex-1 flex flex-col gap-4 py-8">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-lg font-medium text-foreground hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
                   </Link>
-                </div>
-                <div className="flex-1 flex flex-col gap-4 py-8">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="text-lg font-medium text-foreground hover:text-primary"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-                 <Button asChild className='w-full' size="lg"><Link href="/add-listing">List your property</Link></Button>
+                ))}
               </nav>
+              <div className="mt-auto flex flex-col gap-2">
+                <Button asChild className='w-full' size="lg" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/add-listing">List your property</Link>
+                </Button>
+                {user ? (
+                   <Button asChild className='w-full' size="lg" variant="outline" onClick={() => setIsMobileMenuOpen(false)}>
+                     <Link href="/profile">My Profile</Link>
+                   </Button>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button asChild variant="outline" onClick={() => setIsMobileMenuOpen(false)}><Link href="/login">Log In</Link></Button>
+                    <Button asChild onClick={() => setIsMobileMenuOpen(false)}><Link href="/register">Sign Up</Link></Button>
+                  </div>
+                )}
+              </div>
             </SheetContent>
           </Sheet>
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button asChild className="hidden md:inline-flex rounded-full" variant="ghost"><Link href="/add-listing">List your property</Link></Button>
-          <Button asChild variant="ghost" size="icon">
-            <Link href="/favorites">
-              <Heart className="h-5 w-5" />
-              <span className="sr-only">Favorites</span>
-            </Link>
+          <Button asChild className="hidden md:inline-flex rounded-full" variant="outline">
+            <Link href="/add-listing">List your property</Link>
           </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                 <Avatar>
-                  <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Guest User</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    guest@apexestates.com
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Heart className="mr-2 h-4 w-4" />
-                <span>Favorites</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+          {user && (
+            <Button asChild variant="ghost" size="icon">
+              <Link href="/favorites">
+                <Heart className="h-5 w-5" />
+                <span className="sr-only">Favorites</span>
+              </Link>
+            </Button>
+          )}
+          <div className="hidden md:flex">
+            <UserMenu />
+          </div>
         </div>
       </div>
     </header>
