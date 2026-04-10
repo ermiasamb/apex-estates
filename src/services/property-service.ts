@@ -2,7 +2,7 @@
 
 import { apiClient } from '@/lib/api-client';
 
-async function createProperty(data: any): Promise<any> {
+export async function createProperty(data: any): Promise<any> {
     console.log("Preparing to submit property data:", data);
 
     const payload = { ...data };
@@ -47,7 +47,3 @@ async function createProperty(data: any): Promise<any> {
         throw new Error('Failed to connect to the server. Please try again later.');
     }
 }
-
-export const propertyService = {
-    createProperty,
-};

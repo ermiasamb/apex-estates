@@ -21,7 +21,7 @@ import { ImageDropzone } from './ImageDropzone';
 import { useState } from 'react';
 import Image from 'next/image';
 import { ImageCategory } from '@/lib/placeholder-images';
-import { propertyService } from '@/services/property-service';
+import { createProperty } from '@/services/property-service';
 
 const nearbyPlaceTypes: NearbyPlaceType[] = ['hospital', 'school', 'restaurant', 'church', 'playground', 'transport', 'gym', 'spa', 'mall'];
 const propertyCategories: PropertyCategory[] = ['apartment', 'condominium', 'villa', 'house', 'townhouse', 'land'];
@@ -136,7 +136,7 @@ export function AddListingForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await propertyService.createProperty(values);
+      await createProperty(values);
       toast({
         title: 'Property Submitted!',
         description: `"${values.title}" has been successfully submitted for review.`,
@@ -292,7 +292,7 @@ export function AddListingForm() {
                         <div key={field.id} className="flex items-center gap-4 p-2 border rounded-lg">
                            <div className="w-24 h-24 relative flex-shrink-0 bg-muted rounded-md overflow-hidden">
                                 {field.file ? 
-                                    <Image src={URL.createObjectURL(field.file)} alt="preview" layout="fill" objectFit="cover" /> 
+                                    <Image src={URL.createObjectURL(field.file)} alt="preview" fill objectFit="cover" /> 
                                     : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />
                                 }
                             </div>
@@ -329,7 +329,7 @@ export function AddListingForm() {
                         }}
                         dropzoneOptions={{multiple: false, accept: {'image/*': ['.png', '.gif', '.jpeg', '.jpg']}}} 
                         />
-                     {floorPlanPreview && <div className="mt-4 w-32 h-32 relative"><Image src={floorPlanPreview} alt="floor plan preview" layout="fill" objectFit="contain" /></div>}
+                     {floorPlanPreview && <div className="mt-4 w-32 h-32 relative"><Image src={floorPlanPreview} alt="floor plan preview" fill objectFit="contain" /></div>}
                 </div>
 
                 <Separator/>
