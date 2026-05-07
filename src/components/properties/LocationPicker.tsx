@@ -53,10 +53,13 @@ export function LocationPicker({ initialPosition, onLocationChange }: LocationPi
           } else {
              onLocationChange({ ...newPos, address: 'Address not found', cityState: '' });
              console.error(`Geocode was not successful for the following reason: ${status}`);
+             const isApiNotEnabled = status === 'REQUEST_DENIED' || (results === null && status !== 'ZERO_RESULTS');
              toast({
                 variant: 'destructive',
-                title: 'Geocoding Service Error',
-                description: 'Could not fetch address. Please ensure the Geocoding API is enabled for your API key in the Google Cloud Console.',
+                title: isApiNotEnabled ? 'Geocoding API Not Enabled' : 'Geocoding Service Error',
+                description: isApiNotEnabled
+                  ? 'The Geocoding API is not activated. Please enable it at https://console.cloud.google.com/apis/library/geocoding'
+                  : 'Could not fetch address. Please try again.',
              });
           }
         });

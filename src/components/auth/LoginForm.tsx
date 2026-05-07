@@ -31,7 +31,7 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       const response = await authService.login(values.email, values.password);
-      login(response.user); // Use the login function from the auth context
+      login(response); // Use the login function from the auth context with full response
       toast({ title: 'Login successful!' });
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Login Failed', description: error.message });

@@ -23,9 +23,9 @@ import Image from 'next/image';
 import { ImageCategory } from '@/lib/placeholder-images';
 import { createProperty } from '@/services/property-service';
 
-const nearbyPlaceTypes: NearbyPlaceType[] = ['hospital', 'school', 'restaurant', 'church', 'playground', 'transport', 'gym', 'spa', 'mall'];
-const propertyCategories: PropertyCategory[] = ['apartment', 'condominium', 'villa', 'house', 'townhouse', 'land'];
-const imageCategories: ImageCategory[] = ['exterior', 'interior', 'living-room', 'kitchen', 'bedroom', 'bathroom', 'plan'];
+const nearbyPlaceTypes = ['hospital', 'school', 'restaurant', 'church', 'playground', 'transport', 'gym', 'spa', 'mall'] as const;
+const propertyCategories = ['apartment', 'condominium', 'villa', 'house', 'townhouse', 'land'] as const;
+const imageCategories = ['exterior', 'interior', 'living-room', 'kitchen', 'bedroom', 'bathroom', 'plan'] as const;
 
 const formSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }),
@@ -99,12 +99,12 @@ export function AddListingForm() {
       title: '',
       description: '',
       price: 0,
-      location: 'New York, NY',
+      location: 'Addis Ababa, Ethiopia',
       address: '',
-      coordinates: { lat: 40.7128, lng: -74.0060 },
+      coordinates: { lat: 9.021808, lng: 38.800203 },
       bedrooms: 1,
       bathrooms: 1,
-      area: 1000,
+      area: 100,
       amenities: [],
       images: [],
       environmentalInfo: {
