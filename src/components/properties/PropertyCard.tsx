@@ -3,9 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BedDouble, Bath, SquareGanttChart, MapPin } from 'lucide-react';
+import { BedDouble, Bath, SquareGanttChart, MapPin, Lock } from 'lucide-react';
 import type { Property } from '@/lib/types';
-import { placeholderImages } from '@/lib/placeholder-images.json';
+import placeholderImagesData from '@/lib/placeholder-images.json';
 import { FavoriteButton } from './FavoriteButton';
 import { Carousel, CarouselContent, CarouselItem, useCarousel, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
@@ -50,7 +50,17 @@ function CarouselDots() {
 
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  const images = property.imageIds.map(id => placeholderImages.find(p => p.id === id)).filter(Boolean);
+  const images = property.images?.length
+    ? property.images.map((url, index) => ({
+        imageUrl: url,
+        description: `${property.title} image ${index + 1}`,
+        imageHint: property.category,
+      }))
+    : property.imageIds.map(id => placeholderImagesData.placeholderImages.find(p => p.id === id)).filter(Boolean);
+
+  const displayImages = images.length > 0
+    ? images
+    : placeholderImagesData.placeholderImages.filter(image => image.id.startsWith('property-')).slice(0, 1);
 
   const formatPrice = (price: number) => {
     if (property.type === 'rent') {
@@ -64,7 +74,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
       <CardHeader className="p-0 relative">
         <Carousel className="w-full group" opts={{ loop: true }}>
           <CarouselContent>
-            {images.map((image, index) => (
+            {displayImages.map((image, index) => (
               image && (
                 <CarouselItem key={index}>
                   <Link href={`/property/${property.id}`} className="block overflow-hidden">
@@ -73,6 +83,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         src={image.imageUrl}
                         alt={image.description}
                         fill
+                        unoptimized={Boolean(property.images?.length)}
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         data-ai-hint={image.imageHint}
@@ -106,9 +117,17 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </p>
             <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1">
                 <MapPin className="w-4 h-4 shrink-0" />
-                <span className="truncate">{property.address}</span>
+                <span className="truncate">{property.price ? property.address : property.address}</span>
+                {!property.price && <Lock className="w-3 h-3 shrink-0 text-muted-foreground/50" />}
             </div>
-            <p className="font-bold text-xl mt-2">{formatPrice(property.price)}</p>
+            {property.price ? (
+              <p className="font-bold text-xl mt-2">{formatPrice(property.price)}</p>
+            ) : (
+              <p className="font-bold text-xl mt-2 text-muted-foreground/70 flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Sign in to view price
+              </p>
+            )}
         </CardContent>
         <CardFooter className="p-4 pt-0">
             <div className="flex justify-between items-center w-full text-sm text-muted-foreground">

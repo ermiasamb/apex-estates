@@ -13,28 +13,41 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { amenities as allAmenities, brokers } from '@/lib/data';
-import { Trash2, PlusCircle, UploadCloud, Image as ImageIcon } from 'lucide-react';
+import { Trash2, PlusCircle, UploadCloud, Image as ImageIcon, Wifi, ParkingSquare, PawPrint, VenetianMask, Utensils, Droplets, Snowflake, Dumbbell, Sun } from 'lucide-react';
 import type { NearbyPlaceType, PropertyCategory } from '@/lib/types';
 import { LocationPicker } from './LocationPicker';
 import { ImageDropzone } from './ImageDropzone';
-import { useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ImageCategory } from '@/lib/placeholder-images';
-import { createProperty } from '@/services/property-service';
+import { createProperty, updateProperty } from '@/services/property-service';
+import { fetchAgents } from '@/services/user-service';
+import { useRouter } from 'next/navigation';
 
 const nearbyPlaceTypes = ['hospital', 'school', 'restaurant', 'church', 'playground', 'transport', 'gym', 'spa', 'mall'] as const;
 const propertyCategories = ['apartment', 'condominium', 'villa', 'house', 'townhouse', 'land'] as const;
 const imageCategories = ['exterior', 'interior', 'living-room', 'kitchen', 'bedroom', 'bathroom', 'plan'] as const;
+
+const amenityList = [
+  { name: 'WiFi', icon: Wifi },
+  { name: 'Parking', icon: ParkingSquare },
+  { name: 'Pet Friendly', icon: PawPrint },
+  { name: 'Balcony', icon: VenetianMask },
+  { name: 'Kitchen', icon: Utensils },
+  { name: 'Pool', icon: Droplets },
+  { name: 'Generator Backup', icon: Snowflake },
+  { name: 'Gym', icon: Dumbbell },
+  { name: 'Rooftop Deck', icon: Sun },
+];
 
 const formSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }),
   description: z.string().min(20, { message: 'Description must be at least 20 characters.' }),
   type: z.enum(['sale', 'rent'], { required_error: 'You need to select a listing type.' }),
   category: z.enum(propertyCategories, { required_error: 'You need to select a property category.' }),
-  status: z.enum(['available', 'sold', 'rented'], { required_error: 'You need to select a status.' }),
+  status: z.enum(['available', 'sold', 'rented', 'draft'], { required_error: 'You need to select a status.' }),
   price: z.coerce.number({ invalid_type_error: "Price must be a number" }).positive({ message: 'Price must be a positive number.' }),
-  
+
   location: z.string().min(2, { message: 'Location is required.' }),
   address: z.string().min(5, { message: 'Please select a location on the map.' }),
   coordinates: z.object({
@@ -47,9 +60,9 @@ const formSchema = z.object({
   area: z.coerce.number().positive({ message: 'Area must be a positive number.' }),
 
   amenities: z.array(z.string()).optional(),
-  
+
   brokerId: z.string({ required_error: 'Please select a broker.' }),
-  
+
   environmentalInfo: z.object({
     walkScore: z.coerce.number().min(0).max(100),
     bikeScore: z.coerce.number().min(0).max(100),
@@ -63,13 +76,14 @@ const formSchema = z.object({
       type: z.enum(nearbyPlaceTypes),
       distance: z.string().min(1, { message: "Distance is required."}),
   })).optional(),
-  
+
   images: z.array(z.object({
       file: z.any(),
       category: z.enum(imageCategories)
-  })).min(1, "Please upload at least one image."),
+  })).optional(),
 
   floorPlan: z.any().optional(),
+  floorPlanUrl: z.string().optional().or(z.literal('')),
 
   videoType: z.enum(['url', 'upload']).default('url'),
   videoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
@@ -89,10 +103,32 @@ const formSchema = z.object({
     }
 });
 
+export type ListingFormValues = z.infer<typeof formSchema>;
 
-export function AddListingForm() {
+interface AddListingFormProps {
+  mode?: 'create' | 'edit';
+  propertyId?: string;
+  initialValues?: Partial<ListingFormValues>;
+  existingImageUrls?: string[];
+  existingFloorPlanUrl?: string;
+  existingVideoUrl?: string;
+  currentAgent?: { id: string; name: string };
+}
+
+export function AddListingForm({ mode = 'create', propertyId, initialValues, existingImageUrls = [], existingFloorPlanUrl, existingVideoUrl, currentAgent }: AddListingFormProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [agents, setAgents] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadAgents() {
+      const result = await fetchAgents();
+      setAgents(result || []);
+    }
+    loadAgents();
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -107,6 +143,7 @@ export function AddListingForm() {
       area: 100,
       amenities: [],
       images: [],
+      floorPlanUrl: '',
       environmentalInfo: {
         walkScore: 50,
         bikeScore: 50,
@@ -117,6 +154,11 @@ export function AddListingForm() {
       nearbyPlaces: [],
       videoUrl: '',
       vrTourUrl: '',
+      status: 'available',
+      type: 'sale',
+      category: 'apartment',
+      brokerId: '',
+      ...initialValues,
     },
   });
 
@@ -129,26 +171,46 @@ export function AddListingForm() {
       control: form.control,
       name: "images"
   });
-  
-  const [floorPlanPreview, setFloorPlanPreview] = useState<string | null>(null);
-  const [videoFilePreview, setVideoFilePreview] = useState<string | null>(null);
+
+  const [floorPlanPreview, setFloorPlanPreview] = useState<string | null>(existingFloorPlanUrl || null);
+  const [videoFilePreview, setVideoFilePreview] = useState<string | null>(existingVideoUrl && initialValues?.videoType === 'upload' ? existingVideoUrl : null);
+  const brokerOptions = useMemo(() => {
+    if (!currentAgent?.id || agents.some((broker: any) => broker.id === currentAgent.id)) {
+      return agents;
+    }
+
+    return [
+      { id: currentAgent.id, name: currentAgent.name },
+      ...agents,
+    ];
+  }, [currentAgent, agents]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await createProperty(values);
+      if (mode === 'edit' && propertyId) {
+        await updateProperty(propertyId, values);
+      } else {
+        await createProperty(values);
+      }
       toast({
-        title: 'Property Submitted!',
-        description: `"${values.title}" has been successfully submitted for review.`,
+        title: mode === 'edit' ? 'Property Updated' : 'Property Submitted!',
+        description: mode === 'edit'
+          ? `"${values.title}" has been successfully updated.`
+          : `"${values.title}" has been successfully submitted for review.`,
       });
-      form.reset();
-      // Clear previews
-      setFloorPlanPreview(null);
-      setVideoFilePreview(null);
+      if (mode === 'edit') {
+        router.push('/my-properties');
+        router.refresh();
+      } else {
+        form.reset();
+        setFloorPlanPreview(null);
+        setVideoFilePreview(null);
+      }
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Submission Failed',
+        title: mode === 'edit' ? 'Update Failed' : 'Submission Failed',
         description: error.message || 'There was a problem with your submission.',
       });
     } finally {
@@ -219,7 +281,7 @@ export function AddListingForm() {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select property status" /></SelectTrigger></FormControl>
                         <SelectContent>
-                            <SelectItem value="available">Available</SelectItem><SelectItem value="sold">Sold</SelectItem><SelectItem value="rented">Rented</SelectItem>
+                            <SelectItem value="available">Available</SelectItem><SelectItem value="draft">Draft</SelectItem><SelectItem value="sold">Sold</SelectItem><SelectItem value="rented">Rented</SelectItem>
                         </SelectContent>
                         </Select>
                         <FormMessage />
@@ -270,12 +332,21 @@ export function AddListingForm() {
             <FormField control={form.control} name="area" render={({ field }) => ( <FormItem><FormLabel>Area (sqft)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
           </CardContent>
         </Card>
-        
+
         <Card>
             <CardHeader><CardTitle>Media</CardTitle><CardDescription>Upload images and videos for your property.</CardDescription></CardHeader>
             <CardContent className="space-y-6">
                 <div>
                     <FormLabel>Property Images</FormLabel>
+                    {mode === 'edit' && existingImageUrls.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-3">
+                            {existingImageUrls.map((url, index) => (
+                                <div key={url} className="relative aspect-square overflow-hidden rounded-md border bg-muted">
+                                    <Image src={url} alt={`Current property image ${index + 1}`} fill className="object-cover" unoptimized />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <FormControl>
                         <ImageDropzone onDrop={(acceptedFiles) => {
                              acceptedFiles.forEach(file => {
@@ -291,8 +362,8 @@ export function AddListingForm() {
                     {imageFields.map((field, index) => (
                         <div key={field.id} className="flex items-center gap-4 p-2 border rounded-lg">
                            <div className="w-24 h-24 relative flex-shrink-0 bg-muted rounded-md overflow-hidden">
-                                {field.file ? 
-                                    <Image src={URL.createObjectURL(field.file)} alt="preview" fill objectFit="cover" /> 
+                                {field.file ?
+                                    <Image src={URL.createObjectURL(field.file)} alt="preview" fill objectFit="cover" />
                                     : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />
                                 }
                             </div>
@@ -319,7 +390,22 @@ export function AddListingForm() {
 
                 <div>
                     <FormLabel>Floor Plan</FormLabel>
-                    <ImageDropzone 
+                    {mode === 'edit' && existingFloorPlanUrl && (
+                        <div className="mb-4 p-3 bg-muted rounded-lg">
+                            <p className="text-sm font-medium mb-2 text-muted-foreground">Current Floor Plan:</p>
+                            <div className="w-40 h-40 relative rounded-md overflow-hidden border bg-white">
+                                <Image
+                                    src={existingFloorPlanUrl}
+                                    alt="Current floor plan"
+                                    fill
+                                    className="object-contain"
+                                    unoptimized
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-2">Upload a new floor plan to replace it</p>
+                        </div>
+                    )}
+                    <ImageDropzone
                         onDrop={(acceptedFiles) => {
                             const file = acceptedFiles[0];
                             if(file) {
@@ -327,9 +413,9 @@ export function AddListingForm() {
                                 setFloorPlanPreview(URL.createObjectURL(file));
                             }
                         }}
-                        dropzoneOptions={{multiple: false, accept: {'image/*': ['.png', '.gif', '.jpeg', '.jpg']}}} 
+                        dropzoneOptions={{multiple: false, accept: {'image/*': ['.png', '.gif', '.jpeg', '.jpg']}}}
                         />
-                     {floorPlanPreview && <div className="mt-4 w-32 h-32 relative"><Image src={floorPlanPreview} alt="floor plan preview" fill objectFit="contain" /></div>}
+                     {floorPlanPreview && floorPlanPreview !== existingFloorPlanUrl && <div className="mt-4 w-32 h-32 relative"><Image src={floorPlanPreview} alt="floor plan preview" fill objectFit="contain" /></div>}
                 </div>
 
                 <Separator/>
@@ -357,22 +443,35 @@ export function AddListingForm() {
                 ) : (
                     <div>
                         <FormLabel>Upload Video File</FormLabel>
-                        <ImageDropzone 
+                        {mode === 'edit' && existingVideoUrl && initialValues?.videoType === 'upload' && (
+                            <div className="mb-4 p-3 bg-muted rounded-lg">
+                                <p className="text-sm font-medium mb-2 text-muted-foreground">Current Video:</p>
+                                <div className="aspect-video rounded-md overflow-hidden border bg-black">
+                                    <video
+                                        src={existingVideoUrl}
+                                        controls
+                                        className="w-full h-full"
+                                    />
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-2">Upload a new video to replace it</p>
+                            </div>
+                        )}
+                        <ImageDropzone
                             onDrop={(acceptedFiles) => {
                                 const file = acceptedFiles[0];
                                 if(file) {
                                     form.setValue('videoFile', file);
                                     setVideoFilePreview(URL.createObjectURL(file));
                                 }
-                            }} 
-                            dropzoneOptions={{multiple: false, accept: {'video/*': ['.mp4', '.webm']}}} 
+                            }}
+                            dropzoneOptions={{multiple: false, accept: {'video/*': ['.mp4', '.webm']}}}
                         />
-                        {videoFilePreview && <p className="text-sm text-muted-foreground mt-2">Selected: {form.getValues('videoFile')?.name}</p>}
+                        {videoFilePreview && videoFilePreview !== existingVideoUrl && <p className="text-sm text-muted-foreground mt-2">Selected: {form.getValues('videoFile')?.name}</p>}
                     </div>
                 )}
-               
+
                 <Separator/>
-                
+
                 <FormField control={form.control} name="vrTourUrl" render={({ field }) => (
                     <FormItem>
                         <FormLabel>360° Virtual Tour URL</FormLabel>
@@ -389,7 +488,7 @@ export function AddListingForm() {
             <FormField control={form.control} name="amenities" render={() => (
                 <FormItem>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {allAmenities.map((amenity) => (
+                    {amenityList.map((amenity) => (
                       <FormField key={amenity.name} control={form.control} name="amenities" render={({ field }) => (
                             <FormItem key={amenity.name} className="flex flex-row items-start space-x-3 space-y-0">
                               <FormControl><Checkbox checked={field.value?.includes(amenity.name)} onCheckedChange={(checked) => {
@@ -406,7 +505,7 @@ export function AddListingForm() {
               )} />
           </CardContent>
         </Card>
-        
+
         <Card>
             <CardHeader><CardTitle>Nearby Places</CardTitle><CardDescription>Add places of interest near the property.</CardDescription></CardHeader>
             <CardContent className="space-y-4">
@@ -440,7 +539,7 @@ export function AddListingForm() {
                         <FormLabel>Listing Agent</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Select a listing agent" /></SelectTrigger></FormControl>
-                            <SelectContent>{brokers.map(broker => (<SelectItem key={broker.id} value={broker.id}>{broker.name}</SelectItem>))}</SelectContent>
+                            <SelectContent>{brokerOptions.map((broker: any) => (<SelectItem key={broker.id} value={broker.id}>{broker.name}</SelectItem>))}</SelectContent>
                         </Select><FormMessage />
                     </FormItem>
                 )} />
@@ -459,7 +558,7 @@ export function AddListingForm() {
         </Card>
 
         <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Submitting...' : 'Create Listing'}
+            {isLoading ? (mode === 'edit' ? 'Saving...' : 'Submitting...') : (mode === 'edit' ? 'Save Changes' : 'Create Listing')}
         </Button>
       </form>
     </Form>

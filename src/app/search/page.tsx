@@ -1,16 +1,16 @@
 'use client';
+
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useState, useMemo } from 'react';
-import { properties as allProperties } from '@/lib/data';
-import type { Property } from '@/lib/types';
+import { useState, useEffect } from 'react';
 import { PropertyCard } from '@/components/properties/PropertyCard';
-import { PropertyFilters } from '@/components/properties/PropertyFilters';
+import { PropertyFilters, type FilterState } from '@/components/properties/PropertyFilters';
 import { Button } from '@/components/ui/button';
 import { List, Map } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import dynamic from 'next/dynamic';
+import { fetchProperties, mapApiProperty } from '@/services/property-service';
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(m => m.PropertyMap), {
   ssr: false,
@@ -19,9 +19,8 @@ const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     query: searchParams.get('q') || '',
     type: (searchParams.get('type') as 'sale' | 'rent' | 'all' | null) || 'all',
     minPrice: Number(searchParams.get('minPrice')) || 0,
@@ -31,20 +30,43 @@ function SearchPageContent() {
     nearby: [] as string[],
   });
 
-  const filteredProperties = useMemo(() => {
-    return allProperties.filter((property) => {
-      const { query, type, minPrice, maxPrice, bedrooms, bathrooms, nearby } = filters;
-      
-      const queryLower = query.toLowerCase();
-      const matchesQuery = !query || property.title.toLowerCase().includes(queryLower) || property.location.toLowerCase().includes(queryLower) || property.address.toLowerCase().includes(queryLower);
-      const matchesType = !type || type === 'all' || property.type === type;
-      const matchesPrice = property.price >= minPrice && (maxPrice === Infinity || property.price <= maxPrice);
-      const matchesBedrooms = bedrooms === 'any' || property.bedrooms >= Number(bedrooms.replace('+', ''));
-      const matchesBathrooms = bathrooms === 'any' || property.bathrooms >= Number(bathrooms.replace('+', ''));
-      const matchesNearby = nearby.length === 0 || nearby.every(amenity => property.nearbyPlaces?.some(place => place.type === amenity));
-      
-      return matchesQuery && matchesType && matchesPrice && matchesBedrooms && matchesBathrooms && matchesNearby;
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+
+  // Sync filters from URL search params whenever they change (handles soft navigation)
+  useEffect(() => {
+    setFilters({
+      query: searchParams.get('q') || '',
+      type: (searchParams.get('type') as 'sale' | 'rent' | 'all' | null) || 'all',
+      minPrice: Number(searchParams.get('minPrice')) || 0,
+      maxPrice: Number(searchParams.get('maxPrice')) || Infinity,
+      bedrooms: 'any',
+      bathrooms: 'any',
+      nearby: [] as string[],
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
+    async function loadProperties() {
+      setLoading(true);
+      try {
+        const response = await fetchProperties(filters);
+        if (response && response.items && response.items.length > 0) {
+          const mapped = response.items.map(mapApiProperty);
+          setProperties(mapped);
+        } else {
+          setProperties([]);
+        }
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+        setProperties([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProperties();
   }, [filters]);
 
   return (
@@ -56,7 +78,7 @@ function SearchPageContent() {
             <h1 className="text-xl font-headline font-semibold">
                 Real Estate & Homes For Sale
             </h1>
-            <p className="text-muted-foreground text-sm">{filteredProperties.length} results</p>
+            <p className="text-muted-foreground text-sm">{properties.length} results</p>
           </div>
           <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
               <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('list')}>
@@ -71,12 +93,20 @@ function SearchPageContent() {
         </div>
       </div>
       
-      {viewMode === 'list' ? (
+      {loading ? (
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-pulse">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-[300px] bg-muted rounded-xl" />
+            ))}
+          </div>
+        </div>
+      ) : viewMode === 'list' ? (
         <ScrollArea className="flex-grow">
             <div className="container mx-auto px-4 py-6">
-                {filteredProperties.length > 0 ? (
+                {properties.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredProperties.map((property) => (
+                    {properties.map((property) => (
                         <PropertyCard key={property.id} property={property} />
                     ))}
                     </div>
@@ -92,9 +122,9 @@ function SearchPageContent() {
         <div className="flex-grow flex">
           <ScrollArea className="w-full lg:w-3/5 xl:w-1/2">
             <div className='p-4'>
-                 {filteredProperties.length > 0 ? (
+                 {properties.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {filteredProperties.map((property) => (
+                    {properties.map((property) => (
                         <PropertyCard key={property.id} property={property} />
                     ))}
                     </div>
@@ -107,14 +137,13 @@ function SearchPageContent() {
             </div>
           </ScrollArea>
           <div className="hidden lg:block lg:w-2/5 xl:w-1/2 h-full">
-            <PropertyMap properties={filteredProperties} />
+            <PropertyMap properties={properties} />
           </div>
         </div>
       )}
     </div>
   );
 }
-
 
 export default function SearchPage() {
     return (

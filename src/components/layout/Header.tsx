@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/shared/Logo';
-import { Heart, Menu, User, LogOut, UserPlus } from 'lucide-react';
+import { Building2, Heart, Menu, User, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,6 +74,9 @@ export function Header() {
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/favorites"><Heart className="mr-2 h-4 w-4" />Favorites</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/my-properties"><Building2 className="mr-2 h-4 w-4" />My Properties</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout}>
@@ -149,9 +152,14 @@ export function Header() {
                   <Link href="/add-listing">List your property</Link>
                 </Button>
                 {user ? (
-                   <Button asChild className='w-full' size="lg" variant="outline" onClick={() => setIsMobileMenuOpen(false)}>
-                     <Link href="/profile">My Profile</Link>
-                   </Button>
+                  <div className="grid grid-cols-1 gap-2">
+                    <Button asChild className='w-full' size="lg" variant="outline" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link href="/my-properties">My Properties</Link>
+                    </Button>
+                    <Button asChild className='w-full' size="lg" variant="outline" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link href="/profile">My Profile</Link>
+                    </Button>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     <Button asChild variant="outline" onClick={() => setIsMobileMenuOpen(false)}><Link href="/login">Log In</Link></Button>

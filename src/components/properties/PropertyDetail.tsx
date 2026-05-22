@@ -1,12 +1,10 @@
 'use client';
-import { brokers, amenities as allAmenities } from '@/lib/data';
 import Image from 'next/image';
 import Link from 'next/link';
-import { placeholderImages } from '@/lib/placeholder-images.json';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye, History, Share2, Heart, Home } from 'lucide-react';
+import { BedDouble, Bath, SquareGanttChart, MapPin, Building, CalendarDays, Phone, Mail, School, Hospital, Utensils as UtensilsIcon, Eye, History, Share2, Heart, Home, Wifi, ParkingSquare, PawPrint, VenetianMask, Utensils, Droplets, Snowflake, Dumbbell, Sun, Lock } from 'lucide-react';
 import { PhotoGallery } from '@/components/properties/PhotoGallery';
 import { FavoriteButton } from './FavoriteButton';
 import { TrackView } from '@/components/properties/TrackView';
@@ -20,6 +18,9 @@ import { AskQuestionForm } from './AskQuestionForm';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { ShareDialog } from './ShareDialog';
 import dynamic from 'next/dynamic';
+import type { LucideIcon } from 'lucide-react';
+import { useAuth } from '@/providers/auth-provider';
+import { PublicRestrictionOverlay } from './PublicRestrictionOverlay';
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap').then(m => m.PropertyMap), {
     ssr: false,
@@ -59,6 +60,17 @@ const PriceHistoryChart = dynamic(() => import('./PriceHistoryChart').then(m => 
     loading: () => <Skeleton className="h-64 w-full" />,
 });
 
+const amenityIcons: Record<string, LucideIcon> = {
+  WiFi: Wifi,
+  Parking: ParkingSquare,
+  'Pet Friendly': PawPrint,
+  Balcony: VenetianMask,
+  Kitchen: Utensils,
+  Pool: Droplets,
+  'Generator Backup': Snowflake,
+  Gym: Dumbbell,
+  'Rooftop Deck': Sun,
+};
 
 const placeIcons: Record<string, React.ReactElement> = {
     hospital: <Hospital className="w-5 h-5 text-primary" />,
@@ -67,9 +79,9 @@ const placeIcons: Record<string, React.ReactElement> = {
 };
 
 export function PropertyDetail({ property }: { property: Property }) {
-  const broker = brokers.find((b) => b.id === property.brokerId);
-  const brokerAvatar = placeholderImages.find(p => p.id === broker?.avatarId);
-  const floorPlanImage = placeholderImages.find(p => p.id === property.floorPlanId);
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+  const broker = property.broker || null;
 
   const formatPrice = (price: number) => {
     if (property.type === 'rent') {
@@ -78,7 +90,12 @@ export function PropertyDetail({ property }: { property: Property }) {
     return `$${price.toLocaleString()}`;
   };
 
-  const propertyAmenities = allAmenities.filter(a => property.amenities.includes(a.name));
+  const propertyAmenities = (property.amenities || [])
+    .map(name => ({ name, icon: amenityIcons[name] }))
+    .filter(a => a.icon);
+
+  const hasPrice = !!property.price;
+  const hasContactInfo = !!broker && (!!broker.phone || !!broker.email);
 
   return (
     <>
@@ -86,7 +103,7 @@ export function PropertyDetail({ property }: { property: Property }) {
       <div className="bg-background">
         {/* Gallery */}
         <div className='container mx-auto px-4 pt-8'>
-            <PhotoGallery imageIds={property.imageIds} />
+            <PhotoGallery imageIds={property.imageIds} images={property.images} />
         </div>
 
         <div className="container mx-auto px-4 py-8 md:py-12">
@@ -100,7 +117,10 @@ export function PropertyDetail({ property }: { property: Property }) {
                                 <h1 className="text-3xl md:text-4xl font-headline font-bold text-foreground">{property.title}</h1>
                                 <div className="flex items-center gap-2 text-muted-foreground mt-2">
                                     <MapPin className="w-5 h-5" />
-                                    <span className="text-base hover:underline cursor-pointer">{property.address}</span>
+                                    <span className="text-base hover:underline cursor-pointer">
+                                      {property.address}
+                                      {!hasPrice && <Lock className="w-3 h-3 inline-block ml-1 text-muted-foreground/50" />}
+                                    </span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -188,14 +208,21 @@ export function PropertyDetail({ property }: { property: Property }) {
                     )}
                     
                     {/* Media Grid */}
-                    {(floorPlanImage || property.videoUrl) && (
+                    {(property.floorPlanUrl || property.videoUrl) && (
                         <>
                             <Separator />
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                                {floorPlanImage && (
+                                {property.floorPlanUrl && (
                                     <div>
                                         <h3 className="font-headline text-2xl mb-4">Floor Plan</h3>
-                                        <Image src={floorPlanImage.imageUrl} alt="Floor Plan" width={800} height={600} className="rounded-md w-full border mt-4" data-ai-hint={floorPlanImage.imageHint} />
+                                        <Image
+                                            src={property.floorPlanUrl}
+                                            alt="Floor Plan"
+                                            width={800}
+                                            height={600}
+                                            className="rounded-md w-full border mt-4"
+                                            unoptimized
+                                        />
                                     </div>
                                 )}
                                 {property.videoUrl && (
@@ -243,45 +270,101 @@ export function PropertyDetail({ property }: { property: Property }) {
                 {/* Sidebar */}
                 <div className="lg:col-span-1">
                     <div className="sticky top-24 space-y-8">
+                        {/* Price Card - Show lock overlay if no price */}
                         <Card className="shadow-lg rounded-xl border-2">
                             <CardHeader>
-                                <CardTitle className='font-headline text-3xl'>{formatPrice(property.price)}</CardTitle>
+                                {hasPrice ? (
+                                    <CardTitle className='font-headline text-3xl'>{formatPrice(property.price)}</CardTitle>
+                                ) : (
+                                    <div className="flex items-center gap-3 text-muted-foreground/70">
+                                        <Lock className="w-6 h-6" />
+                                        <CardTitle className='font-headline text-2xl'>Sign in to view price</CardTitle>
+                                    </div>
+                                )}
                                 <Badge variant="outline" className={cn('capitalize text-base w-fit', property.status === 'available' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-yellow-100 text-yellow-800 border-yellow-300')}>{property.status}</Badge>
                             </CardHeader>
                             <CardContent>
-                                {broker && <AskQuestionForm />}
+                                {broker && (
+                                  isAuthenticated ? (
+                                    <AskQuestionForm />
+                                  ) : (
+                                    <PublicRestrictionOverlay message="Sign in to contact the agent about this property">
+                                      <div className="space-y-4">
+                                        <div className="h-10 bg-muted rounded" />
+                                        <div className="h-10 bg-muted rounded" />
+                                        <div className="h-24 bg-muted rounded" />
+                                        <div className="h-10 bg-muted rounded" />
+                                      </div>
+                                    </PublicRestrictionOverlay>
+                                  )
+                                )}
                             </CardContent>
                         </Card>
                         
                         <EnvironmentalInfo info={property.environmentalInfo} />
 
-                        {property.type === 'sale' && <MortgageCalculator propertyPrice={property.price} />}
+                        {property.type === 'sale' && (
+                          isAuthenticated && hasPrice ? (
+                            <MortgageCalculator propertyPrice={property.price} />
+                          ) : (
+                            <PublicRestrictionOverlay message="Sign in to calculate your mortgage">
+                              <div className="h-48 bg-muted rounded-lg" />
+                            </PublicRestrictionOverlay>
+                          )
+                        )}
 
+                        {/* Broker/Agent Card */}
                         {broker && (
-                            <Card className="text-center">
+                            isAuthenticated ? (
+                              <Card className="text-center">
+                                  <CardContent className="p-6">
+                                      <p className="text-sm text-muted-foreground mb-4">Listed by</p>
+                                      <Avatar className="w-16 h-16 mx-auto mb-2">
+                                          <AvatarImage src={broker.avatar || ''} alt={broker.name} />
+                                          <AvatarFallback>{broker.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+                                      </Avatar>
+                                      <p className="font-semibold">{broker.name}</p>
+                                      <p className="text-xs text-muted-foreground">Listing Agent</p>
+                                      {hasContactInfo && (
+                                        <div className='flex gap-2 mt-4'>
+                                            {broker.phone && (
+                                              <Button className="w-full" asChild size="sm">
+                                                  <a href={`tel:${broker.phone}`}><Phone className='mr-2' />Call</a>
+                                              </Button>
+                                            )}
+                                            {broker.email && (
+                                              <Button className="w-full" variant="secondary" asChild size="sm">
+                                                  <a href={`mailto:${broker.email}`}><Mail className='mr-2' />Email</a>
+                                              </Button>
+                                            )}
+                                        </div>
+                                      )}
+                                      <Button className="w-full mt-2" variant="outline" asChild size="sm">
+                                          <Link href={`/broker/${broker.id}`}>View Profile</Link>
+                                      </Button>
+                                  </CardContent>
+                              </Card>
+                            ) : (
+                              <Card className="text-center">
                                 <CardContent className="p-6">
-                                    <p className="text-sm text-muted-foreground mb-4">Listed by</p>
-                                    {brokerAvatar &&
-                                        <Avatar className="w-16 h-16 mx-auto mb-2">
-                                            <AvatarImage src={brokerAvatar.imageUrl} alt={broker.name} data-ai-hint={brokerAvatar.imageHint}/>
-                                            <AvatarFallback>{broker.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                        </Avatar>
-                                    }
-                                    <p className="font-semibold">{broker.name}</p>
-                                    <p className="text-xs text-muted-foreground">Listing Agent</p>
-                                    <div className='flex gap-2 mt-4'>
-                                        <Button className="w-full" asChild size="sm">
-                                            <a href={`tel:${broker.phone}`}><Phone className='mr-2' />Call</a>
-                                        </Button>
-                                        <Button className="w-full" variant="secondary" asChild size="sm">
-                                            <a href={`mailto:${broker.email}`}><Mail className='mr-2' />Email</a>
-                                        </Button>
-                                    </div>
-                                    <Button className="w-full mt-2" variant="outline" asChild size="sm">
-                                        <Link href={`/broker/${broker.id}`}>View Profile</Link>
-                                    </Button>
+                                  <p className="text-sm text-muted-foreground mb-4">Listed by</p>
+                                  <Avatar className="w-16 h-16 mx-auto mb-2">
+                                      <AvatarImage src={broker.avatar || ''} alt={broker.name} />
+                                      <AvatarFallback>{broker.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+                                  </Avatar>
+                                  <p className="font-semibold">{broker.name}</p>
+                                  <p className="text-xs text-muted-foreground">Listing Agent</p>
+                                  <div className="mt-4">
+                                    <PublicRestrictionOverlay message="Sign in to contact this agent">
+                                      <div className="flex gap-2">
+                                        <div className="h-9 w-full bg-muted rounded-md" />
+                                        <div className="h-9 w-full bg-muted rounded-md" />
+                                      </div>
+                                    </PublicRestrictionOverlay>
+                                  </div>
                                 </CardContent>
-                            </Card>
+                              </Card>
+                            )
                         )}
                     </div>
                 </div>

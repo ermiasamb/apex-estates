@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { placeholderImages } from '@/lib/placeholder-images.json';
+import placeholderImagesData from '@/lib/placeholder-images.json';
 import {
   Carousel,
   CarouselContent,
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PhotoGalleryProps {
   imageIds: string[];
+  images?: string[];
 }
 
 function CarouselDots() {
@@ -52,8 +53,20 @@ function CarouselDots() {
     );
 }
 
-export function PhotoGallery({ imageIds }: PhotoGalleryProps) {
-  const allImages = useMemo(() => imageIds.map(id => placeholderImages.find(p => p.id === id)).filter((p): p is ImagePlaceholder => Boolean(p)), [imageIds]);
+export function PhotoGallery({ imageIds, images }: PhotoGalleryProps) {
+  const allImages = useMemo(() => {
+    if (images?.length) {
+      return images.map((url, index) => ({
+        id: `api-image-${index}`,
+        imageUrl: url,
+        description: `Property image ${index + 1}`,
+        imageHint: 'property',
+        category: 'exterior' as ImageCategory,
+      }));
+    }
+
+    return imageIds.map(id => placeholderImagesData.placeholderImages.find(p => p.id === id)).filter((p): p is ImagePlaceholder => Boolean(p));
+  }, [imageIds, images]);
   
   const categories = useMemo(() => {
     const cats = allImages.reduce((acc, image) => {
@@ -99,6 +112,7 @@ export function PhotoGallery({ imageIds }: PhotoGalleryProps) {
                         alt={image.description}
                         fill
                         priority={index === 0}
+                        unoptimized={Boolean(images?.length)}
                         className="object-cover"
                         sizes="100vw"
                         data-ai-hint={image.imageHint}

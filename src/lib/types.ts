@@ -2,6 +2,9 @@ import type { LucideIcon } from 'lucide-react';
 
 export type PropertyCategory = 'apartment' | 'condominium' | 'villa' | 'house' | 'townhouse' | 'land';
 
+// Align with backend PropertyStatus enum in Prisma schema
+export type PropertyStatus = 'DRAFT' | 'PENDING_APPROVAL' | 'ACTIVE' | 'RESERVED' | 'SOLD' | 'RENTED' | 'EXPIRED' | 'ARCHIVED' | 'REJECTED';
+
 export interface Property {
   id: string;
   title: string;
@@ -16,11 +19,13 @@ export interface Property {
   bathrooms: number;
   area: number; // in sqft
   imageIds: string[];
+  images?: string[];
   amenities: string[];
   floorPlanId: string;
+  floorPlanUrl?: string;
   videoUrl?: string;
   brokerId: string;
-  status: 'available' | 'sold' | 'rented';
+  status: PropertyStatus | string;
   vrTourUrl?: string;
   nearbyPlaces?: NearbyPlace[];
   postedOn: string; // ISO date string
@@ -28,6 +33,13 @@ export interface Property {
   saves: number;
   priceHistory: PriceHistoryEntry[];
   environmentalInfo: EnvironmentalInfo;
+  broker?: {
+    id: string;
+    name: string;
+    avatar?: string;
+    phone?: string;
+    email?: string;
+  };
 }
 
 export interface PriceHistoryEntry {

@@ -10,4 +10,4 @@ export type ImagePlaceholder = {
   category: ImageCategory;
 };
 
-export const placeholderImages: ImagePlaceholder[] = data.placeholderImages;
+export const placeholderImages: ImagePlaceholder[] = data.placeholderImages as ImagePlaceholder[];

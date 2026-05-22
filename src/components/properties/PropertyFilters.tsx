@@ -11,9 +11,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { SlidersHorizontal } from 'lucide-react';
 import { Separator } from '../ui/separator';
 
-type FilterState = {
+export type FilterState = {
     query: string;
-    type: 'sale' | 'rent' | 'all' | null;
+    type: 'sale' | 'rent' | 'all';
     minPrice: number;
     maxPrice: number;
     bedrooms: string;

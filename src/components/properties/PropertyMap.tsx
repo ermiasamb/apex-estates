@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
-import { placeholderImages } from '@/lib/placeholder-images.json';
+import placeholderImagesData from '@/lib/placeholder-images.json';
 
 interface PropertyMapProps {
   properties: Property[];
@@ -87,7 +87,7 @@ export function PropertyMap({ properties }: PropertyMapProps) {
               <Card className="border-none shadow-none rounded-lg overflow-hidden">
                 <CardHeader className="p-0 relative">
                   {(() => {
-                    const image = placeholderImages.find(p => p.id === activeProperty.imageIds[0]);
+                    const image = placeholderImagesData.placeholderImages.find(p => p.id === activeProperty.imageIds[0]);
                     if (!image) return null;
                     return (
                        <div className="aspect-[4/3] w-full relative">
