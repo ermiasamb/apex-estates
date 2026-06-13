@@ -251,5 +251,5 @@ class ApiClient {
 }
 
 // Automatically resolve base URL pointing to the Nest.js REST API
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003/api/v1';
 export const apiClient = new ApiClient(API_URL);
