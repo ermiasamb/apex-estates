@@ -18,6 +18,7 @@ import { AskQuestionForm } from './AskQuestionForm';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { ShareDialog } from './ShareDialog';
 import dynamic from 'next/dynamic';
+import { PropertyDetailMap } from './PropertyDetailMap';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
 import { PublicRestrictionOverlay } from './PublicRestrictionOverlay';
@@ -100,13 +101,13 @@ export function PropertyDetail({ property }: { property: Property }) {
   return (
     <>
       <TrackView propertyId={property.id} />
-      <div className="bg-background">
+      <div className="bg-background mx-auto">
         {/* Gallery */}
-        <div className='container mx-auto px-4 pt-8'>
+        <div className='mx-auto px-4 pt-8' style={{ maxWidth: '80%', margin: '0 auto' }}>
             <PhotoGallery imageIds={property.imageIds} images={property.images} />
         </div>
 
-        <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="mx-auto px-4 py-8 md:py-12" style={{ maxWidth: '80%', margin: '0 auto' }}>
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 items-start">
                 <div className="lg:col-span-2 space-y-8">
@@ -125,7 +126,7 @@ export function PropertyDetail({ property }: { property: Property }) {
                             </div>
                             <div className="flex items-center gap-2">
                                 <ShareDialog property={property} />
-                                <FavoriteButton propertyId={property.id} className="h-12 w-12 bg-card border shadow-sm" />
+                                <FavoriteButton propertyId={property.id} className="h-12 w-12 bg-card border shadow-sm text-primary" />
                             </div>
                         </div>
 
@@ -148,7 +149,7 @@ export function PropertyDetail({ property }: { property: Property }) {
 
                     {/* Description */}
                     <div className="prose prose-lg max-w-none text-foreground/90">
-                        <h3 className='font-headline text-2xl mb-4'>Property Description</h3>
+                        <h3 className='font-headline  font-bold text-xl mb-4'>Property Description</h3>
                         <p>{property.description}</p>
                     </div>
 
@@ -157,7 +158,7 @@ export function PropertyDetail({ property }: { property: Property }) {
                         <>
                             <Separator />
                              <div>
-                                <h3 className='font-headline text-2xl mb-4'>What this place offers</h3>
+                                <h3 className='font-headline  font-bold text-xl  mb-4'>What this place offers</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4 mt-4">
                                     {propertyAmenities.map(amenity => (
                                     <div key={amenity.name} className="flex items-center gap-3">
@@ -193,7 +194,7 @@ export function PropertyDetail({ property }: { property: Property }) {
                         <>
                             <Separator />
                              <div>
-                                <h3 className='font-headline text-2xl mb-4 flex items-center gap-3'><Eye/> 360° Virtual Tour</h3>
+                                <h3 className='font-headline  font-bold text-xl  mb-4 flex items-center gap-3'><Eye/> 360° Virtual Tour</h3>
                                 <div className="aspect-video w-full rounded-lg overflow-hidden border mt-4">
                                     <iframe
                                         className="w-full h-full"
@@ -207,41 +208,11 @@ export function PropertyDetail({ property }: { property: Property }) {
                         </>
                     )}
                     
-                    {/* Media Grid */}
-                    {(property.floorPlanUrl || property.videoUrl) && (
-                        <>
-                            <Separator />
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                                {property.floorPlanUrl && (
-                                    <div>
-                                        <h3 className="font-headline text-2xl mb-4">Floor Plan</h3>
-                                        <Image
-                                            src={property.floorPlanUrl}
-                                            alt="Floor Plan"
-                                            width={800}
-                                            height={600}
-                                            className="rounded-md w-full border mt-4"
-                                            unoptimized
-                                        />
-                                    </div>
-                                )}
-                                {property.videoUrl && (
-                                    <div>
-                                        <h3 className="font-headline text-2xl mb-4">Video Tour</h3>
-                                        <div className="aspect-video mt-4">
-                                            <iframe className="w-full h-full rounded-md border" src={property.videoUrl} title="Property Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    )}
-
                     {property.nearbyPlaces && property.nearbyPlaces.length > 0 && (
                         <>
                             <Separator />
                             <div>
-                                <h3 className='font-headline text-2xl mb-4'>What's Nearby?</h3>
+                                <h3 className='font-headline font-bold text-xl mb-4'>What's Nearby?</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                                 {property.nearbyPlaces.map(place => (
                                     <div key={place.name} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
@@ -256,13 +227,43 @@ export function PropertyDetail({ property }: { property: Property }) {
                             </div>
                         </>
                     )}
+                    
+                    {/* Media Grid */}
+                    {(property.floorPlanUrl || property.videoUrl) && (
+                        <>
+                            <Separator />
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                                {property.floorPlanUrl && (
+                                    <div>
+                                        <h3 className="font-headline font-bold text-xl mb-4">Floor Plan</h3>
+                                        <Image
+                                            src={property.floorPlanUrl}
+                                            alt="Floor Plan"
+                                            width={800}
+                                            height={600}
+                                            className="rounded-md w-full border mt-4"
+                                            unoptimized
+                                        />
+                                    </div>
+                                )}
+                                {property.videoUrl && (
+                                    <div>
+                                        <h3 className="font-headline  font-bold text-xl mb-4">Video Tour</h3>
+                                        <div className="aspect-video mt-4">
+                                            <iframe className="w-full h-full rounded-md border" src={property.videoUrl} title="Property Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
 
                     {/* Map */}
                     <Separator />
                     <div>
-                        <h3 className="font-headline text-2xl mb-4">Location</h3>
+                        <h3 className="font-headline  font-bold text-xl mb-4">Location</h3>
                          <div className={cn("h-96 rounded-lg overflow-hidden border mt-4")}>
-                            <PropertyMap properties={[property]} />
+                            <PropertyDetailMap property={property} />
                         </div>
                     </div>
                 </div>
@@ -270,17 +271,10 @@ export function PropertyDetail({ property }: { property: Property }) {
                 {/* Sidebar */}
                 <div className="lg:col-span-1">
                     <div className="sticky top-24 space-y-8">
-                        {/* Price Card - Show lock overlay if no price */}
+                        {/* Price Card - Show to everyone */}
                         <Card className="shadow-lg rounded-xl border-2">
                             <CardHeader>
-                                {hasPrice ? (
-                                    <CardTitle className='font-headline text-3xl'>{formatPrice(property.price)}</CardTitle>
-                                ) : (
-                                    <div className="flex items-center gap-3 text-muted-foreground/70">
-                                        <Lock className="w-6 h-6" />
-                                        <CardTitle className='font-headline text-2xl'>Sign in to view price</CardTitle>
-                                    </div>
-                                )}
+                                <CardTitle className='font-headline text-3xl'>{formatPrice(property.price)}</CardTitle>
                                 <Badge variant="outline" className={cn('capitalize text-base w-fit', property.status === 'available' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-yellow-100 text-yellow-800 border-yellow-300')}>{property.status}</Badge>
                             </CardHeader>
                             <CardContent>
@@ -304,13 +298,7 @@ export function PropertyDetail({ property }: { property: Property }) {
                         <EnvironmentalInfo info={property.environmentalInfo} />
 
                         {property.type === 'sale' && (
-                          isAuthenticated && hasPrice ? (
-                            <MortgageCalculator propertyPrice={property.price} />
-                          ) : (
-                            <PublicRestrictionOverlay message="Sign in to calculate your mortgage">
-                              <div className="h-48 bg-muted rounded-lg" />
-                            </PublicRestrictionOverlay>
-                          )
+                          <MortgageCalculator propertyPrice={property.price} />
                         )}
 
                         {/* Broker/Agent Card */}

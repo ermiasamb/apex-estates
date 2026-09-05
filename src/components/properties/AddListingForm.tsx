@@ -23,6 +23,7 @@ import { ImageCategory } from '@/lib/placeholder-images';
 import { createProperty, updateProperty } from '@/services/property-service';
 import { fetchAgents } from '@/services/user-service';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/auth-provider';
 
 const nearbyPlaceTypes = ['hospital', 'school', 'restaurant', 'church', 'playground', 'transport', 'gym', 'spa', 'mall'] as const;
 const propertyCategories = ['apartment', 'condominium', 'villa', 'house', 'townhouse', 'land'] as const;
@@ -118,8 +119,21 @@ interface AddListingFormProps {
 export function AddListingForm({ mode = 'create', propertyId, initialValues, existingImageUrls = [], existingFloorPlanUrl, existingVideoUrl, currentAgent }: AddListingFormProps) {
   const { toast } = useToast();
   const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [agents, setAgents] = useState<any[]>([]);
+
+  // Check authentication on mount
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Required',
+        description: 'You must be logged in to create a property listing.',
+      });
+      router.push('/login?redirect=/add-listing');
+    }
+  }, [isAuthenticated, router, toast]);
 
   useEffect(() => {
     async function loadAgents() {
@@ -186,6 +200,17 @@ export function AddListingForm({ mode = 'create', propertyId, initialValues, exi
   }, [currentAgent, agents]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Double-check authentication before submission
+    if (!isAuthenticated) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Required',
+        description: 'You must be logged in to create a property listing.',
+      });
+      router.push('/login?redirect=/add-listing');
+      return;
+    }
+
     setIsLoading(true);
     try {
       if (mode === 'edit' && propertyId) {
@@ -208,6 +233,7 @@ export function AddListingForm({ mode = 'create', propertyId, initialValues, exi
         setVideoFilePreview(null);
       }
     } catch (error: any) {
+      console.error('[AddListingForm] Submission error:', error);
       toast({
         variant: 'destructive',
         title: mode === 'edit' ? 'Update Failed' : 'Submission Failed',

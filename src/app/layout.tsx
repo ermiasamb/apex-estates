@@ -7,10 +7,10 @@ import { MapsApiProvider } from '@/components/properties/MapsApiProvider';
 import { AuthProvider } from '@/providers/auth-provider';
 
 export const metadata: Metadata = {
-  title: 'Apex Estates | Premium Real Estate',
-  description: 'Find your next home with Apex Estates. We offer a comprehensive list of properties for sale and rent.',
+  title: 'Dan Besh | Premium Real Estate',
+  description: 'Find your next home with Dan Besh. We offer a comprehensive list of properties for sale and rent.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/logo.png',
   },
 };
 

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
@@ -14,7 +15,6 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Logo } from '@/components/shared/Logo';
 
 import {
   DropdownMenu,
@@ -213,9 +213,15 @@ export function Header() {
           href="/"
           className="group flex shrink-0 items-center gap-2 transition-transform duration-300 hover:scale-[1.03]"
         >
-          <Logo />
+          <Image 
+            src="/logo.png" 
+            alt="Dan Besh" 
+            width={32} 
+            height={32}
+            className="h-8 w-8"
+          />
           <span className="hidden font-headline text-lg font-bold text-neutral-950 sm:inline-block">
-            Apex Estates
+            Dan Besh
           </span>
         </Link>
 
@@ -341,9 +347,15 @@ export function Header() {
                   onClick={closeMobileMenu}
                   className="flex items-center gap-2"
                 >
-                  <Logo />
+                  <Image 
+                    src="/logo.png" 
+                    alt="Dan Besh" 
+                    width={32} 
+                    height={32}
+                    className="h-8 w-8"
+                  />
                   <span className="font-headline text-lg font-bold">
-                    Apex Estates
+                    Dan Besh
                   </span>
                 </Link>
               </div>
@@ -396,7 +408,7 @@ export function Header() {
                 <div className="mt-7 rounded-[2rem] bg-neutral-950 p-5 text-white shadow-lg">
                   <p className="text-lg font-bold">List your property</p>
                   <p className="mt-2 text-sm text-white/70">
-                    Reach buyers and renters faster with Apex Estates.
+                    Reach buyers and renters faster with Dan Besh.
                   </p>
 
                   <Button

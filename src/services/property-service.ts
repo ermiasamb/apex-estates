@@ -58,7 +58,6 @@ const statusToFrontend: Record<string, string> = {
 function buildPropertyPayload(data: any): any {
     const cityState = data.location || 'Addis Ababa, Ethiopia';
     const city = cityState.split(',')[0]?.trim() || 'Addis Ababa';
-    const country = cityState.split(',')[1]?.trim() || 'Ethiopia';
 
     return {
         title: data.title,
@@ -70,7 +69,6 @@ function buildPropertyPayload(data: any): any {
         location: {
             address: data.address || data.location || 'Addis Ababa',
             city,
-            country,
             state: city,
             latitude: Number(data.coordinates?.lat) || 9.021808,
             longitude: Number(data.coordinates?.lng) || 38.800203,
@@ -85,7 +83,6 @@ function buildPropertyPayload(data: any): any {
             bathrooms: Number(data.bathrooms) || 0,
             totalArea: Number(data.area) || 0,
             description: data.description || '',
-            amenities: data.amenities || [],
             parkingSpaces: 1,
             yearBuilt: 2024,
         },
@@ -108,8 +105,11 @@ export function mapApiProperty(item: any): any {
     const mediaUrls = mediaItems.length > 0
         ? mediaItems
             .filter((media: any) => !media.type || media.type === 'IMAGE')
-            .map((media: any) => media.url || media.publicUrl)
-            .filter(Boolean)
+            .map((media: any) => ({
+              url: media.url || media.publicUrl,
+              category: media.category || 'exterior',
+            }))
+            .filter((m: any) => m.url)
         : [];
     const floorPlanUrl = mediaItems.find((media: any) => media.type === 'FLOOR_PLAN')?.publicUrl;
     const uploadedVideoUrl = mediaItems.find((media: any) => media.type === 'VIDEO')?.publicUrl;

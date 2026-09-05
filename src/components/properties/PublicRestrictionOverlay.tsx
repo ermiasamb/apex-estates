@@ -23,26 +23,29 @@ export function PublicRestrictionOverlay({
         </div>
       )}
       {!showContent && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-6">
-          <div className="bg-card/95 backdrop-blur rounded-xl shadow-xl border p-6 md:p-8 max-w-sm w-full text-center space-y-4">
-            <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-2">
+          <div className="bg-card/95 backdrop-blur rounded-xl shadow-sm border p-3 md:p-4 max-w-sm w-full text-center space-y-4 flex cols-2 items-center  gap-3">
+            <div className="w-10 h-10 p-2 rounded-full bg-primary/10 flex  ">
               <Lock className="w-6 h-6 text-primary" />
             </div>
-            <div>
-              <h3 className="font-headline font-semibold text-lg">
-                Login for Free to Access
-              </h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                {message}
-              </p>
-            </div>
-            <div className="flex gap-3 pt-2">
-              <Button asChild variant="default" className="flex-1">
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button asChild variant="outline" className="flex-1">
-                <Link href="/signup">Create Account</Link>
-              </Button>
+            <div  className="flex-4">
+              <div  className="flex flex-col  items-start text-start">
+                <h3 className="font-headline font-semibold text-lg">
+                  Login for Free to Access
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {message}
+                </p>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button asChild variant="default" size="sm" className="flex-1">
+                  <Link href="/login">Sign In</Link>
+                </Button>
+                <Button asChild variant="outline"  size="sm" className="flex-1">
+                  <Link href="/signup">Create Account</Link>
+                </Button>
+              </div>
+
             </div>
           </div>
         </div>
