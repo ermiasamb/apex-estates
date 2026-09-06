@@ -209,21 +209,22 @@ export function PropertyMap({ properties, onRadiusChange, defaultRadius = 25 }: 
             />
           ))}
 
-          {/* Property info window - horizontal layout with photo left 30% and info right 70% */}
+          {/* Property info window - compact horizontal layout */}
           {activeProperty && (
             <InfoWindowF
               position={activeProperty.coordinates}
               onCloseClick={() => setActiveMarker(null)}
               options={{ pixelOffset: typeof window !== 'undefined' ? new window.google.maps.Size(0, -40) : undefined }}
             >
-              <div className="w-96">
+              <div className="w-80">
                 <Link href={`/property/${activeProperty.id}`}>
-                  <div className="flex gap-4 p-3 bg-white rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                    {/* Left side - Photo (30%) */}
-                    <div className="w-32 h-24 flex-shrink-0 rounded-md overflow-hidden">
+                  <div className="flex gap-2 p-2 bg-white rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+                    {/* Left side - Photo (compact) */}
+                    <div className="w-24 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
                       {(() => {
-                        const image = placeholderImagesData.placeholderImages.find(p => p.id === activeProperty.imageIds[0]);
-                        if (!image) {
+                        const imageUrl = activeProperty.images?.[0] || 
+                          placeholderImagesData.placeholderImages.find(p => p.id.startsWith('property-'))?.imageUrl;
+                        if (!imageUrl) {
                           return (
                             <div className="w-full h-full bg-muted flex items-center justify-center">
                               <span className="text-xs text-muted-foreground">No image</span>
@@ -232,45 +233,34 @@ export function PropertyMap({ properties, onRadiusChange, defaultRadius = 25 }: 
                         }
                         return (
                           <Image
-                            src={image.imageUrl}
-                            alt={image.description}
-                            width={128}
-                            height={96}
+                            src={imageUrl}
+                            alt={activeProperty.title}
+                            width={96}
+                            height={80}
                             className="object-cover w-full h-full"
-                            data-ai-hint={image.imageHint}
+                            unoptimized={Boolean(activeProperty.images?.length)}
                           />
                         )
                       })()}
                     </div>
 
-                    {/* Right side - Info (70%) */}
-                    <div className="flex-1 flex flex-col justify-between">
+                    {/* Right side - Info (compact) */}
+                    <div className="flex-1 flex flex-col justify-between gap-1">
                       {/* Price */}
-                      <div>
-                        <p className="font-bold text-lg text-foreground">
-                          {formatPrice(activeProperty.price, activeProperty.type)}
-                        </p>
-                      </div>
+                      <p className="font-bold text-sm text-foreground">
+                        {formatPrice(activeProperty.price, activeProperty.type)}
+                      </p>
 
                       {/* Title */}
-                      <p className="font-semibold text-sm text-foreground line-clamp-2 mb-2">
+                      <p className="font-medium text-xs text-foreground line-clamp-1">
                         {activeProperty.title}
                       </p>
 
                       {/* Stats */}
-                      <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-foreground">{activeProperty.bedrooms}</span>
-                          <span>Bedrooms</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-foreground">{activeProperty.bathrooms}</span>
-                          <span>Bathrooms</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-foreground">{activeProperty.area.toLocaleString()}</span>
-                          <span>sqft</span>
-                        </div>
+                      <div className="flex gap-2 text-xs text-muted-foreground">
+                        <span>{activeProperty.bedrooms}bd</span>
+                        <span>{activeProperty.bathrooms}ba</span>
+                        <span>{activeProperty.area.toLocaleString()}sqft</span>
                       </div>
                     </div>
                   </div>
