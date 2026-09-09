@@ -19,145 +19,73 @@ type PropertyMediaValues = {
     videoFile?: File;
 };
 
-const categoryToBackend: Record<string, string> = {
-    apartment: 'APARTMENT',
-    condominium: 'CONDO',
-    villa: 'VILLA',
-    house: 'VILLA',
-    townhouse: 'TOWNHOUSE',
-    land: 'LAND_PLOT',
-};
-
-const categoryToFrontend: Record<string, string> = {
-    APARTMENT: 'apartment',
-    CONDO: 'condominium',
-    VILLA: 'villa',
-    TOWNHOUSE: 'townhouse',
-    LAND_PLOT: 'land',
-};
-
-const statusToBackend: Record<string, string> = {
-    available: 'ACTIVE',
-    sold: 'SOLD',
-    rented: 'RENTED',
-    draft: 'DRAFT',
-    active: 'ACTIVE',
-    featured: 'FEATURED',
-};
-
-const statusToFrontend: Record<string, string> = {
-    ACTIVE: 'available',
-    FEATURED: 'available',
-    PENDING_APPROVAL: 'available',
-    SOLD: 'sold',
-    RENTED: 'rented',
-    DRAFT: 'draft',
-    ARCHIVED: 'archived',
-};
+// Use shared transformation utilities instead
+import { transformFormToBackendPayload, transformBackendToFormValues, ensureUppercase } from '@/lib/form-transform';
+import { PropertyFormSchema } from '@/lib/form-schemas';
+import type { PropertyFormValuesDto } from '@/lib/form-types';
 
 function buildPropertyPayload(data: any): any {
-    const cityState = data.location || 'Addis Ababa, Ethiopia';
-    const city = cityState.split(',')[0]?.trim() || 'Addis Ababa';
+    // Validate using shared schema
+    const validation = PropertyFormSchema.safeParse(data);
+    if (!validation.success) {
+        console.warn('[Property Service] Form validation failed:', validation.error.flatten());
+    }
 
-    return {
-        title: data.title,
-        titleAm: data.title,
-        category: categoryToBackend[(data.category || '').toLowerCase()] || 'APARTMENT',
-        propertyType: 'RESIDENTIAL',
-        listingType: (data.type || 'sale').toUpperCase(),
-        status: statusToBackend[(data.status || '').toLowerCase()] || undefined,
-        location: {
-            address: data.address || data.location || 'Addis Ababa',
-            city,
-            state: city,
-            latitude: Number(data.coordinates?.lat) || 9.021808,
-            longitude: Number(data.coordinates?.lng) || 38.800203,
-        },
-        pricing: {
-            price: Number(data.price),
-            currency: 'USD',
-            priceNegotiable: true,
-        },
-        details: {
-            bedrooms: Number(data.bedrooms) || 0,
-            bathrooms: Number(data.bathrooms) || 0,
-            totalArea: Number(data.area) || 0,
-            description: data.description || '',
-            parkingSpaces: 1,
-            yearBuilt: 2024,
-        },
-        amenities: data.amenities || [],
-        nearbyPlaces: data.nearbyPlaces || [],
-        environmentalInfo: data.environmentalInfo,
-        videoUrl: data.videoUrl || undefined,
-        virtualTourUrl: data.vrTourUrl || undefined,
-        floorPlanUrl: data.floorPlanUrl || undefined,
-        agentId: data.brokerId || undefined,
-    };
+    // Use shared transformation utility
+    return transformFormToBackendPayload(data);
 }
 
 export function mapApiProperty(item: any): any {
-    const city = item.location?.city || item.city || 'Addis Ababa';
-    const address = item.location?.address || item.address || city;
-    const latitude = item.location?.latitude ?? item.latitude;
-    const longitude = item.location?.longitude ?? item.longitude;
-    const mediaItems = item.media || [];
-    const mediaUrls = mediaItems.length > 0
-        ? mediaItems
-            .filter((media: any) => !media.type || media.type === 'IMAGE')
-            .map((media: any) => ({
-              url: media.url || media.publicUrl,
-              category: media.category || 'exterior',
-            }))
-            .filter((m: any) => m.url)
-        : [];
-    const floorPlanUrl = mediaItems.find((media: any) => media.type === 'FLOOR_PLAN')?.publicUrl;
-    const uploadedVideoUrl = mediaItems.find((media: any) => media.type === 'VIDEO')?.publicUrl;
-
+    // Use shared transformation
+    const formValues = transformBackendToFormValues(item);
+    
+    // Map to property display interface
     return {
         id: item.id,
-        title: item.title,
-        type: item.listingType?.toLowerCase() || 'sale',
-        category: categoryToFrontend[item.category] || categoryToFrontend[item.type] || item.category?.toLowerCase() || item.type?.toLowerCase() || 'apartment',
-        price: Number(item.pricing?.price ?? item.price ?? 0),
-        location: city,
-        address,
-        bedrooms: item.details?.bedrooms ?? item.bedrooms ?? 0,
-        bathrooms: item.details?.bathrooms ?? item.bathrooms ?? 0,
-        area: item.details?.totalArea ?? item.area ?? 0,
-        description: item.details?.description ?? item.description ?? '',
-        images: mediaUrls,
+        title: formValues.title,
+        type: (formValues.listingType || 'SALE').toLowerCase(),
+        category: formValues.category?.toLowerCase() || 'apartment',
+        price: formValues.pricing?.price || 0,
+        location: formValues.location?.city || 'Addis Ababa',
+        address: formValues.location?.address || '',
+        bedrooms: formValues.details?.bedrooms || 0,
+        bathrooms: formValues.details?.bathrooms || 0,
+        area: formValues.details?.totalArea || 0,
+        description: formValues.details?.description || '',
+        images: item.media
+            ?.filter((m: any) => !m.type || m.type === 'IMAGE')
+            .map((m: any) => ({
+              url: m.url || m.publicUrl,
+              category: m.category || 'exterior',
+            }))
+            .filter((m: any) => m.url) || [],
         imageIds: [],
-        amenities: item.details?.amenities ?? item.amenities?.map((entry: any) => entry.amenity?.name || entry.name).filter(Boolean) ?? [],
+        amenities: item.amenities?.map((e: any) => e.amenity?.name || e.name).filter(Boolean) || formValues.amenities || [],
         floorPlanId: '',
-        floorPlanUrl,
-        videoUrl: item.videoUrl || uploadedVideoUrl,
-        vrTourUrl: item.virtualTourUrl,
-        brokerId: item.agent?.id || item.agentId || '',
-        status: statusToFrontend[item.status] || item.status?.toLowerCase() || 'available',
-        rawStatus: item.status,
+        floorPlanUrl: item.media?.find((m: any) => m.type === 'FLOOR_PLAN')?.publicUrl,
+        videoUrl: item.videoUrl || item.media?.find((m: any) => m.type === 'VIDEO')?.publicUrl,
+        vrTourUrl: formValues.metaTitle, // Note: VR tour URL mapping
+        brokerId: item.agent?.id || formValues.agentId || '',
+        status: (formValues.status || 'ACTIVE').toLowerCase(),
+        rawStatus: formValues.status,
         postedOn: item.publishedAt || item.createdAt || new Date().toISOString(),
-        views: item.viewCount ?? item.views ?? 0,
-        saves: item.saveCount ?? item.saves ?? 0,
-        priceHistory: item.priceHistory?.map((entry: any) => ({
-            date: entry.changedAt || entry.date,
-            price: Number(entry.price),
-        })) ?? [],
-        environmentalInfo: item.environmentalInfo ?? {
+        views: item.viewCount || 0,
+        saves: item.saveCount || 0,
+        priceHistory: item.priceHistory?.map((e: any) => ({
+            date: e.changedAt || e.date,
+            price: Number(e.price),
+        })) || [],
+        environmentalInfo: formValues.environmentalInfo || {
             walkScore: 0,
             bikeScore: 0,
             roadSafety: 0,
             floodRisk: 0,
             noiseLevel: 0,
         },
-        nearbyPlaces: item.nearbyPlaces?.map((place: any) => ({
-            name: place.name || place.type || 'Nearby place',
-            type: (place.type || 'transport').toLowerCase(),
-            distance: place.distance ? String(place.distance) : '',
-        })) ?? [],
-        coordinates: latitude && longitude ? {
-            lat: Number(latitude),
-            lng: Number(longitude),
+        nearbyPlaces: formValues.nearbyPlaces || [],
+        coordinates: formValues.location?.latitude && formValues.location?.longitude ? {
+            lat: Number(formValues.location.latitude),
+            lng: Number(formValues.location.longitude),
         } : { lat: 9.021808, lng: 38.800203 },
         broker: item.agent ? {
             id: item.agent.id,
@@ -269,6 +197,14 @@ export async function uploadPropertyMedia(propertyId: string, values: PropertyMe
 export async function createProperty(data: any): Promise<any> {
     console.log("Preparing to submit property data:", data);
 
+    // Validate using shared schema
+    const validation = PropertyFormSchema.safeParse(data);
+    if (!validation.success) {
+        const errors = validation.error.flatten();
+        console.error('[Property Service] Validation failed:', errors);
+        throw new Error(`Form validation failed: ${JSON.stringify(errors.fieldErrors)}`);
+    }
+
     const payload = buildPropertyPayload(data);
 
     try {
@@ -284,6 +220,14 @@ export async function createProperty(data: any): Promise<any> {
 }
 
 export async function updateProperty(id: string, data: any): Promise<any> {
+    // Validate using shared schema
+    const validation = PropertyFormSchema.safeParse(data);
+    if (!validation.success) {
+        const errors = validation.error.flatten();
+        console.error('[Property Service] Validation failed:', errors);
+        throw new Error(`Form validation failed: ${JSON.stringify(errors.fieldErrors)}`);
+    }
+
     try {
         const response = await apiClient.put(`/properties/${id}`, buildPropertyPayload(data));
         await uploadPropertyMedia(id, data);
@@ -392,5 +336,73 @@ export async function fetchPropertyById(id: string): Promise<any> {
     } catch (error) {
         console.error(`Failed to fetch property by id ${id}:`, error);
         throw error;
+    }
+}
+
+/**
+ * Fetch amenities list from backend API
+ * Falls back to constants if API fails
+ */
+export async function fetchAmenities(): Promise<string[]> {
+    try {
+        console.log('[Property Service] Fetching amenities from API...');
+        console.log('[Property Service] API Base URL:', process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003/api/v1');
+        const response = await apiClient.get<any>('/resources/amenities?limit=200');
+        console.log('[Property Service] Amenities API response:', response);
+        
+        // Handle different response formats
+        if (Array.isArray(response)) {
+            const amenities = response.map((item: any) => item.name || item).filter(Boolean);
+            console.log('[Property Service] ✓ Amenities loaded from database:', amenities.length, 'items');
+            console.log('[Property Service] Sample amenities:', amenities.slice(0, 5));
+            return amenities;
+        }
+        
+        if (response?.items && Array.isArray(response.items)) {
+            const amenities = response.items.map((item: any) => item.name || item).filter(Boolean);
+            console.log('[Property Service] ✓ Amenities loaded from database:', amenities.length, 'items');
+            console.log('[Property Service] Sample amenities:', amenities.slice(0, 5));
+            return amenities;
+        }
+        
+        console.warn('[Property Service] Unexpected amenities response format:', response);
+        console.warn('[Property Service] Returning empty array - form will use fallback');
+        return [];
+    } catch (error) {
+        console.error('[Property Service] Failed to fetch amenities:', error);
+        console.error('[Property Service] Returning empty array - form will use fallback');
+        // Return empty array - form will use constants as fallback
+        return [];
+    }
+}
+
+/**
+ * Fetch property categories from backend API
+ * Falls back to constants if API fails
+ */
+export async function fetchPropertyCategories(): Promise<string[]> {
+    try {
+        console.log('[Property Service] Fetching property categories from API...');
+        const response = await apiClient.get<any>('/categories');
+        
+        // Handle different response formats
+        if (Array.isArray(response)) {
+            const categories = response.map((item: any) => item.name || item).filter(Boolean);
+            console.log('[Property Service] Categories loaded:', categories.length);
+            return categories;
+        }
+        
+        if (response?.items && Array.isArray(response.items)) {
+            const categories = response.items.map((item: any) => item.name || item).filter(Boolean);
+            console.log('[Property Service] Categories loaded:', categories.length);
+            return categories;
+        }
+        
+        console.warn('[Property Service] Unexpected categories response format:', response);
+        return [];
+    } catch (error) {
+        console.error('[Property Service] Failed to fetch categories, using fallback:', error);
+        // Return empty array - form will use constants as fallback
+        return [];
     }
 }

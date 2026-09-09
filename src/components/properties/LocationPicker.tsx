@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface LocationPickerProps {
   initialPosition: { lat: number; lng: number };
-  onLocationChange: (location: { lat: number; lng: number; address: string, cityState: string }) => void;
+  onLocationChange: (location: { lat: number; lng: number; address: string, cityState: string, region?: string, subCity?: string }) => void;
 }
 
 export function LocationPicker({ initialPosition, onLocationChange }: LocationPickerProps) {
@@ -37,6 +37,8 @@ export function LocationPicker({ initialPosition, onLocationChange }: LocationPi
             
             let city = '';
             let state = '';
+            let region = '';
+            let subCity = '';
 
             for (const component of results[0].address_components) {
                 if (component.types.includes('locality')) {
@@ -44,11 +46,15 @@ export function LocationPicker({ initialPosition, onLocationChange }: LocationPi
                 }
                 if (component.types.includes('administrative_area_level_1')) {
                     state = component.short_name;
+                    region = component.long_name;
+                }
+                if (component.types.includes('administrative_area_level_2')) {
+                    subCity = component.long_name;
                 }
             }
             const cityState = (city && state) ? `${city}, ${state}` : (city || state);
 
-            onLocationChange({ ...newPos, address, cityState });
+            onLocationChange({ ...newPos, address, cityState, region, subCity });
 
           } else {
              onLocationChange({ ...newPos, address: 'Address not found', cityState: '' });
