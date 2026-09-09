@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Logo } from '@/components/shared/Logo';
+import Image from 'next/image';
 import { Github, Twitter, Linkedin } from 'lucide-react';
 
 export function Footer() {
@@ -9,13 +9,19 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-2">
             <Link href="/" className="flex items-center space-x-2">
-              <Logo />
+              <Image 
+                src="/logo.png" 
+                alt="Dan Besh" 
+                width={32} 
+                height={32}
+                className="h-8 w-8"
+              />
               <span className="font-bold font-headline text-lg">
-                Apex Estates
+                Dan Besh
               </span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Apex Estates. All rights reserved.
+              &copy; {new Date().getFullYear()} Dan Besh. All rights reserved.
             </p>
           </div>
           <div className="flex items-center space-x-4">

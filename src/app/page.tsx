@@ -1,18 +1,40 @@
 'use client';
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { PropertySearchForm } from '@/components/properties/PropertySearchForm';
-import { Card, CardContent } from '@/components/ui/card';
 import { PropertyCard } from '@/components/properties/PropertyCard';
-import { properties } from '@/lib/data';
 import { Recommendations } from '@/components/properties/Recommendations';
-import { placeholderImages } from '@/lib/placeholder-images.json';
+import placeholderImagesData from '@/lib/placeholder-images.json';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { fetchFeaturedProperties, mapApiProperty } from '@/services/property-service';
 
-const heroImage = placeholderImages.find(p => p.id === 'hero-image');
+const heroImage = placeholderImagesData.placeholderImages.find(p => p.id === 'hero-image');
 
 export default function Home() {
-  const featuredProperties = properties.slice(0, 6);
+  const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadFeatured() {
+      try {
+        const response = await fetchFeaturedProperties();
+        if (response && response.items && response.items.length > 0) {
+          const mapped = response.items.map(mapApiProperty);
+          setFeaturedProperties(mapped);
+        } else {
+          setFeaturedProperties([]);
+        }
+      } catch (error) {
+        console.error("Failed to load live featured properties:", error);
+        setFeaturedProperties([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFeatured();
+  }, []);
 
   return (
     <div className="flex flex-col gap-16 md:gap-24">
@@ -48,11 +70,19 @@ export default function Home() {
             Explore a collection of our most sought-after properties, handpicked for their quality and value.
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProperties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(3)].map((_, idx) => (
+              <div key={idx} className="h-[380px] bg-muted rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProperties.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
+          </div>
+        )}
         <div className="text-center mt-12">
             <Button asChild size="lg" variant="outline" className='rounded-full'>
                 <Link href="/search">View All Properties</Link>

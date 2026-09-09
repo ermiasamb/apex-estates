@@ -3,12 +3,14 @@ import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/toaster';
+import { MapsApiProvider } from '@/components/properties/MapsApiProvider';
+import { AuthProvider } from '@/providers/auth-provider';
 
 export const metadata: Metadata = {
-  title: 'Apex Estates | Premium Real Estate',
-  description: 'Find your next home with Apex Estates. We offer a comprehensive list of properties for sale and rent.',
+  title: 'Dan Besh | Premium Real Estate',
+  description: 'Find your next home with Dan Besh. We offer a comprehensive list of properties for sale and rent.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/logo.png',
   },
 };
 
@@ -26,10 +28,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
-          <Header />
-          <main className="min-h-[calc(100vh-200px)]">{children}</main>
-          <Footer />
-          <Toaster />
+        <AuthProvider>
+          <MapsApiProvider>
+            <Header />
+            <main className="min-h-[calc(100vh-200px)]">{children}</main>
+            <Footer />
+            <Toaster />
+          </MapsApiProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -3,9 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BedDouble, Bath, SquareGanttChart, MapPin } from 'lucide-react';
+import { BedDouble, Bath, SquareGanttChart, MapPin, Lock } from 'lucide-react';
 import type { Property } from '@/lib/types';
-import { placeholderImages } from '@/lib/placeholder-images.json';
+import placeholderImagesData from '@/lib/placeholder-images.json';
 import { FavoriteButton } from './FavoriteButton';
 import { Carousel, CarouselContent, CarouselItem, useCarousel, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
@@ -50,7 +50,24 @@ function CarouselDots() {
 
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  const images = property.imageIds.map(id => placeholderImages.find(p => p.id === id)).filter(Boolean);
+  // Filter out empty image URLs from the API response
+  const validImages = property.images?.filter((url): url is string => typeof url === 'string' && !!url && url.trim().length > 0) || [];
+  
+  const images = validImages.length > 0
+    ? validImages.map((url, index) => ({
+        imageUrl: url,
+        description: `${property.title} image ${index + 1}`,
+        imageHint: property.category,
+      }))
+    : property.imageIds
+        .map(id => placeholderImagesData.placeholderImages.find(p => p.id === id))
+        .filter((img): img is typeof placeholderImagesData.placeholderImages[0] => !!img && !!img.imageUrl && img.imageUrl.trim().length > 0);
+
+  const displayImages = images.length > 0
+    ? images
+    : placeholderImagesData.placeholderImages
+        .filter(image => image.id.startsWith('property-') && image.imageUrl && image.imageUrl.trim().length > 0)
+        .slice(0, 1);
 
   const formatPrice = (price: number) => {
     if (property.type === 'rent') {
@@ -60,12 +77,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden group transition-all duration-300 border-none shadow-none hover:shadow-2xl rounded-xl">
+    <Card className="flex flex-col h-full overflow-hidden group transition-all duration-300 border-none shadow-md hover:shadow-2xl rounded-xl">
       <CardHeader className="p-0 relative">
         <Carousel className="w-full group" opts={{ loop: true }}>
           <CarouselContent>
-            {images.map((image, index) => (
-              image && (
+            {displayImages.length > 0 ? (
+              displayImages.map((image, index) => (
                 <CarouselItem key={index}>
                   <Link href={`/property/${property.id}`} className="block overflow-hidden">
                     <div className="aspect-[4/3] w-full relative">
@@ -73,6 +90,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         src={image.imageUrl}
                         alt={image.description}
                         fill
+                        unoptimized={Boolean(validImages.length)}
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         data-ai-hint={image.imageHint}
@@ -82,8 +100,16 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     </div>
                   </Link>
                 </CarouselItem>
-              )
-            ))}
+              ))
+            ) : (
+              <CarouselItem>
+                <div className="aspect-[4/3] w-full relative bg-muted flex items-center justify-center">
+                  <div className="text-center text-muted-foreground">
+                    <p className="text-sm">No images available</p>
+                  </div>
+                </div>
+              </CarouselItem>
+            )}
           </CarouselContent>
           <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-white/80 p-0 text-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 hover:bg-white disabled:opacity-0" />
           <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-white/80 p-0 text-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 hover:bg-white disabled:opacity-0" />

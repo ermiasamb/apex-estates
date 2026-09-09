@@ -1,14 +1,39 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useFavorites } from '@/hooks/useFavorites';
-import { properties as allProperties } from '@/lib/data';
 import { PropertyCard } from '@/components/properties/PropertyCard';
 import { Heart } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { fetchProperties, mapApiProperty } from '@/services/property-service';
 
 export default function FavoritesPage() {
   const { favorites } = useFavorites();
-  const favoriteProperties = allProperties.filter((p) => favorites.includes(p.id));
+  const [favoriteProperties, setFavoriteProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadFavorites() {
+      if (favorites.length === 0) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const response = await fetchProperties({ limit: 100 });
+        if (response && response.items) {
+          const mapped = response.items.map(mapApiProperty);
+          const filtered = mapped.filter((p: any) => favorites.includes(p.id));
+          setFavoriteProperties(filtered);
+        }
+      } catch (error) {
+        console.error("Failed to load favorite properties:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFavorites();
+  }, [favorites]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -19,7 +44,13 @@ export default function FavoritesPage() {
         </p>
       </div>
 
-      {favoriteProperties.length > 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-[300px] rounded-xl" />
+          ))}
+        </div>
+      ) : favoriteProperties.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {favoriteProperties.map((property) => (
             <PropertyCard key={property.id} property={property} />

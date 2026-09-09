@@ -1,22 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useBrowsingHistory } from '@/hooks/useBrowsingHistory';
 import { getRecommendationsAction } from '@/app/actions';
-import { properties as allProperties } from '@/lib/data';
 import { PropertyCard } from './PropertyCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wand2 } from 'lucide-react';
-import type { Property } from '@/lib/types';
 import { Button } from '@/components/ui/button';
+import { fetchProperties, mapApiProperty } from '@/services/property-service';
 
 export function Recommendations() {
   const { history } = useBrowsingHistory();
-  const [recommendations, setRecommendations] = useState<Property[]>([]);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
 
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = useCallback(async () => {
     if (history.length === 0) {
       // Don't fetch if there's no history
       return;
@@ -38,14 +37,26 @@ export function Recommendations() {
         JSON.stringify(preferences)
       );
 
-      const recommendedProperties = allProperties.filter(p => recommendedIds.includes(p.id));
-      setRecommendations(recommendedProperties);
+      if (recommendedIds && recommendedIds.length > 0) {
+        // Fetch all properties from API and filter by recommended IDs
+        const response = await fetchProperties({ limit: 100 });
+        if (response && response.items) {
+          const mapped = response.items.map(mapApiProperty);
+          const recommendedProperties = mapped.filter((p: any) => recommendedIds.includes(p.id));
+          setRecommendations(recommendedProperties);
+        } else {
+          setRecommendations([]);
+        }
+      } else {
+        setRecommendations([]);
+      }
     } catch (error) {
       console.error("Failed to fetch recommendations", error);
+      setRecommendations([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [history]);
 
   useEffect(() => {
     // Automatically fetch recommendations if there's sufficient browsing history.

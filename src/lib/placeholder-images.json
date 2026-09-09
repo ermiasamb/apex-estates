@@ -31,8 +31,8 @@
     {
       "id": "property-1-int-3",
       "description": "Modern bedroom with a view",
-      "imageUrl": "https://images.unsplash.com/photo-1615875605825-5eb9bb5c602a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBiZWRyb29tfGVufDB8fHx8MTc2MzA0MzAzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "modern bedroom",
+       "imageUrl": "https://images.unsplash.com/photo-1556912167-f556f1f39fdf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBraXRjaGVufGVufDB8fHx8MTc2MTg3NTg4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+     "imageHint": "modern bedroom",
       "category": "bedroom"
     },
     {
@@ -129,7 +129,7 @@
     {
       "id": "property-4-int-2",
       "description": "Penthouse bedroom with city views",
-      "imageUrl": "https://images.unsplash.com/photo-1613553474179-c1b0162a033c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZW50aG91c2UlMjBiZWRyb29tfGVufDB8fHx8MTc2MzA0MzI5Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1611755489400-3c53602ab783?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZW50aG91c2UlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NjE5NDU1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "penthouse bedroom",
       "category": "bedroom"
     },
@@ -157,7 +157,7 @@
     {
       "id": "property-5-int-2",
       "description": "Townhouse living room",
-      "imageUrl": "https://images.unsplash.com/photo-1600607687833-22de6f3ba3e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0b3duaG91c2UlMjBsaXZpbmclMjByb29tfGVufDB8fHx8MTc2MzA0MzM4NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1693067171934-67aef5b65e0f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0b3duaG91c2UlMjBraXRjaGVufGVufDB8fHx8MTc2MTk0NTU4OHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "townhouse livingroom",
       "category": "living-room"
     },
@@ -185,8 +185,8 @@
     {
       "id": "property-6-int-2",
       "description": "Beach view bedroom",
-      "imageUrl": "https://images.unsplash.com/photo-1596472493869-9c42ea04564c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHZpZXclMjBiZWRyb29tfGVufDB8fHx8MTc2MzA0MzQ0NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "beach bedroom",
+       "imageUrl": "https://images.unsplash.com/photo-1585550134510-04f7a2072b20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiZWFjaGZyb250JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzYxOTQ1NTg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+     "imageHint": "beach bedroom",
       "category": "bedroom"
     },
     {

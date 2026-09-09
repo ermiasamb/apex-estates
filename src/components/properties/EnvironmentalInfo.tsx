@@ -6,7 +6,7 @@ import { Footprints, Bike, ShieldCheck, CloudRain, Waves } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface EnvironmentalInfoProps {
-    info: EnvInfoType;
+    info?: Partial<EnvInfoType> | null;
 }
 
 const scoreInfo = {
@@ -32,6 +32,12 @@ const getRiskColor = (score: number) => {
 }
 
 export function EnvironmentalInfo({ info }: EnvironmentalInfoProps) {
+    const scores = Object.entries(scoreInfo).map(([key, meta]) => ({
+        key,
+        meta,
+        value: Number(info?.[key as keyof EnvInfoType] ?? 0),
+    }));
+
     return (
         <Card>
             <CardHeader>
@@ -39,8 +45,7 @@ export function EnvironmentalInfo({ info }: EnvironmentalInfoProps) {
             </CardHeader>
             <CardContent className="space-y-4">
                 <TooltipProvider>
-                    {Object.entries(info).map(([key, value]) => {
-                        const meta = scoreInfo[key as keyof typeof scoreInfo];
+                    {scores.map(({ key, meta, value }) => {
                         const isRisk = key === 'floodRisk' || key === 'noiseLevel';
                         const colorClass = isRisk ? getRiskColor(value) : getScoreColor(value);
 
